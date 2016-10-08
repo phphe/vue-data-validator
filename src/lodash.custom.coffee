@@ -20,7 +20,7 @@ module.exports =
   has: (obj, k) -> obj.hasOwnProperty(k)
   mapValues: (obj, cb) ->
     values = {}
-    values[k] = cbj(v, k) for k, v of obj
+    values[k] = cb(v, k) for k, v of obj
     return values
   forEach: (arr, cb) ->
     for k, v of arr

@@ -39,7 +39,7 @@
       values = {};
       for (k in obj) {
         v = obj[k];
-        values[k] = cbj(v, k);
+        values[k] = cb(v, k);
       }
       return values;
     },
