@@ -2,7 +2,7 @@
 (function() {
   var _, assignIfDifferently, empty, isArray, isBool, isNumber, isObject, isPromise, isString, isset;
 
-  _ = require('./lodash.custom.coffee');
+  _ = require('./lodash.custom.js');
 
   isset = function(v) {
     return typeof v !== 'undefined';

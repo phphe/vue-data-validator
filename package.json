@@ -1,8 +1,8 @@
 {
   "name": "vue-data-validator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Vue validator base on data instead of html dom.",
-  "main": "./dist/validator-and-options.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
