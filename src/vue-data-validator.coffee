@@ -65,7 +65,7 @@ module.exports = {
           _.forIn(field._resolvedRules, (v, key) ->
             if _.has(field.errors, key)
               errors[key] = field.errors[key]
-            else if key == ruleName
+            if key == ruleName
               errors[ruleName] =
                 name: ruleName
                 message: message

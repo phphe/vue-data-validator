@@ -106,8 +106,9 @@
             errors = {};
             _.forIn(field._resolvedRules, function(v, key) {
               if (_.has(field.errors, key)) {
-                return errors[key] = field.errors[key];
-              } else if (key === ruleName) {
+                errors[key] = field.errors[key];
+              }
+              if (key === ruleName) {
                 return errors[ruleName] = {
                   name: ruleName,
                   message: message

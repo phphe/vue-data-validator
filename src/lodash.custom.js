@@ -29,7 +29,7 @@
           break;
         }
       }
-      return k;
+      return key;
     },
     has: function(obj, k) {
       return obj.hasOwnProperty(k);

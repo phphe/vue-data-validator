@@ -16,7 +16,7 @@ module.exports =
       if cb(v,k)
         key = k
         break
-    return k
+    return key
   has: (obj, k) -> obj.hasOwnProperty(k)
   mapValues: (obj, cb) ->
     values = {}
