@@ -16,5 +16,9 @@
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.11.1",
     "webpack": "^1.13.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phphe/vue-data-validator.git"
   }
 }
