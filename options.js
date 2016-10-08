@@ -1,1 +1,1 @@
-module.exports = require('./src/vue-data-validator-options.coffee')
+module.exports = require('./src/vue-data-validator-options.js')

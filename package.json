@@ -1,6 +1,6 @@
 {
   "name": "vue-data-validator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Vue validator base on data instead of html dom.",
   "main": "./dist/validator-and-options.js",
   "scripts": {
@@ -14,8 +14,7 @@
   "license": "MIT",
   "devDependencies": {
     "coffee-loader": "^0.7.2",
-    "coffee-script": "^1.11.1",
-    "webpack": "^1.13.2"
+    "coffee-script": "^1.11.1"
   },
   "repository": {
     "type": "git",

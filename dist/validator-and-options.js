@@ -1,1 +1,368 @@
-!function(e){function n(r){if(t[r])return t[r].exports;var a=t[r]={exports:{},id:r,loaded:!1};return e[r].call(a.exports,a,a.exports,n),a.loaded=!0,a.exports}var t={};return n.m=e,n.c=t,n.p="",n(0)}([function(e,n,t){e.exports.validator=t(3),e.exports.options=t(2)},function(e,n){e.exports={pull:function(e,n){var t;return t=e.indexOf(n),t>-1&&e.splice(t,1)},values:function(e){var n,t,r,a;for(a=[],n=0,t=e.length;n<t;n++)r=e[n],a.push(r);return a},findIndex:function(e,n){var t,r,a;r=-1;for(t in e)if(a=e[t],n(a,t)){r=t;break}return t},has:function(e,n){return e.hasOwnProperty(n)},mapValues:function(e,n){var t,r,a;a={};for(t in e)r=e[t],a[t]=cbj(r,t);return a},forEach:function(e,n){var t,r;for(t in e)r=e[t],n(r,t)},forIn:function(e,n){var t,r,a,i;t=0;for(r in e)if(i=e[r],a=n(i,r,t),t++,a===!1)break}}},function(e,n,t){var r,a,i,u,o,s,c,l,f,m,d;r=t(1),d=function(e){return"undefined"!=typeof e},o=function(e){return"[object Boolean]"===Object.prototype.toString.call(e)},m=function(e){return"[object String]"===Object.prototype.toString.call(e)},s=function(e){return"[object Number]"===Object.prototype.toString.call(e)},u=function(e){return"[object Array]"===Object.prototype.toString.call(e)},l=function(e){return"[object Object]"===Object.prototype.toString.call(e)},f=function(e){return"[object Promise]"===Object.prototype.toString.call(e)},c=function(e){var n;return n=parseFloat(e),!isNaN(n)&&s(n)},i=function(e){var n,t,r,a;if(!d(e)||null===e)return!0;if(d(e.length))return 0===e.length;if(o(e)||s(e))return!1;if(isNaN(e))return!0;if(l(e)){for(n=0,t=0,r=e.length;t<r;t++)a=e[t],n++;return 0===n}},a=function(e,n,t){if(e[n]!==t)return e[n]=t},e.exports={rules:{accepted:function(e){return"yes"===e||"on"===e||e===!0||1===e||"1"===e},alpha:function(e){return/^[a-zA-Z]+$/.test(e)},alphaDash:function(e){return/^[\w\-]+$/.test(e)},alphaNum:function(e){return/^[\w]+$/.test(e)},array:function(e){return u(e)},between:function(e,n){return n[0]<=e&&n[1]<=e},"boolean":function(e){return[!0,!1,1,0,"1","0"].includes(e)},confirmed:{handler:function(e,n,t,r){var a;return a=r[t.name+"Confirmation"],e===a.value},sensitive:!0},date:function(e){return/^\d\d\d\d\-\d\d?\-\d\d? \d\d?:\d\d?:\d\d?$/.test(e)},different:{handler:function(e,n,t,r){var a;return a=r[n[0]],e!==a.value},sensitive:!0},email:function(e){return/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(e)},"in":function(e,n){var t;return t=u(n[0])?n[0]:n,t.indexOf(e)>-1},integer:function(e){return/^\-?[1-9]\d*$/.test(e)},max:function(e,n){return e<=n[0]},min:function(e,n){return e>=n[0]},notIn:function(e,n){var t;return t=u(n[0])?n[0]:n,t.indexOf(e)===-1},numeric:function(e){return c(e)},required:{handler:function(e,n,t){return a(t,"required",!0),!i(e)},always:!0},requiredWith:{handler:function(e,n,t,r){return i(r[n[0]].value)?(a(t,"required",!1),!0):(a(t,"required",!0),!i(e))},sensitive:!0,always:!0},same:{handler:function(e,n,t,r){var a;return a=r[n[0]],e===a.value},sensitive:!0},size:function(e,n){return(e||"").toString().length===parseInt(n[0])},string:function(e){return m(e)},length:function(e,n){return(e||"").toString().length===parseInt(n[0])},maxLength:function(e,n){return(e||"").toString().length<=n[0]},minLength:function(e,n){return(e||"").toString().length>=n[0]},lengthBetween:function(e,n){var t;return t=(e||"").toString().length,n[0]<=t&&t<=n[1]}},messages:{accepted:"The :name must be accepted.",alpha:"The :name may only contain letters.",alphaDash:"The :name may only contain letters, numbers, and dashes.",alphaNum:"The :name may only contain letters and numbers.",array:"The :name must be an array.",between:"The :name must be between :params[0] and :params[1].","boolean":"The :name field must be true or false.",confirmed:"The :name confirmation does not match.",date:"The :name is not a valid date.",different:"The :name and :params[0] must be different.",email:"The :name must be a valid email address.","in":"The selected :name is invalid.",integer:"The :name must be an integer.",max:"The :name may not be greater than :params[0].",min:"The :name must be at least :params[0].",notIn:"The selected :name is invalid.",numeric:"The :name must be a number.",required:"The :name field is required.",requiredWith:"The :name field is required when :params[0] is present.",same:"The :name and :params[0] must match.",size:"The :name must be :params[0] characters.",string:"The :name must be a string.",length:"The :name must be :params[0] characters.",maxLength:"The :name may not be greater than :params[0] characters.",minLength:"The :name must be at least :params[0] characters.",lengthBetween:"The :name must be between :params[0] and :params[1] characters."}}},function(e,n,t){var r,a,i,u,o,s,c,l,f,m;r=t(1),m=function(e){return"undefined"!=typeof e},o=function(e){return"[object Boolean]"===Object.prototype.toString.call(e)},f=function(e){return"[object String]"===Object.prototype.toString.call(e)},s=function(e){return"[object Number]"===Object.prototype.toString.call(e)},u=function(e){return"[object Array]"===Object.prototype.toString.call(e)},c=function(e){return"[object Object]"===Object.prototype.toString.call(e)},l=function(e){return"[object Promise]"===Object.prototype.toString.call(e)},i=function(e){var n,t,r,a;if(!m(e)||null===e)return!0;if(m(e.length))return 0===e.length;if(o(e)||s(e))return!1;if(isNaN(e))return!0;if(c(e)){for(n=0,t=0,r=e.length;t<r;t++)a=e[t],n++;return 0===n}},a=function(e,n,t){if(e[n]!==t)return e[n]=t},e.exports={install:function(e,n){return e.Validator={options:n},e.prototype.$validate=function(t,u){var o,s,c,f;return s=function(e){var n,t,r,a,i,u;if(a={},e.rules){u=e.rules.split("|");for(t in u)n=u[t].split(":"),r=n[1]?n[1].split(","):[],i=n[0],e.ruleParams&&e.ruleParams[i]&&(r=r.concat(e.ruleParams[i])),a[i]={name:i,params:r}}return a},c=function(e){var t,o,s,c;return c=function(n){var t;return a(e,"valid",n),r.pull(f._validatingQueue,s),a(f,"validating",f._validatingQueue.length>0),n?(t=r.findIndex(r.values(u),function(e){return!e.valid})===-1,a(f,"valid",t&&!f.validating)):a(f,"valid",n)},t=function(n,t){var a;return a={},r.forIn(e._resolvedRules,function(i,u){return r.has(e.errors,u)?a[u]=e.errors[u]:u===n?a[n]={name:n,message:t}:void 0}),e.errors=a},o=function(t){var a,i,u,o;return a=(null!=(u=e.messages)?u[t.name]:void 0)||n.messages[t.name]||"No error message for :name.",i=e.nameInMessage||(null!=(o=e.text)?o.toString().toLowerCase():void 0)||e.name,a=a.replace(/:name/g,i),r.forIn(t.params,function(e,n){var r;return r=new RegExp(":params\\["+n+"\\]","g"),a=a.replace(r,t.params[n])}),a},s={},f._validatingQueue.push(s),a(f,"validating",!0),e.errors={},r.forIn(e._resolvedRules,function(r){var a,s,f,m;if(f=(null!=(a=e.customRules)?a[r.name]:void 0)||n.rules[r.name],s=f.handler||f,f.always||!i(e.value))return m=s(e.value,r.params,e,u),m=l(m)?m:m?Promise.resolve():Promise.reject(),m.then(function(){return c(!0)})["catch"](function(){return c(!1),t(r.name,o(r))})})},o=this[t],null!=o&&null!=o.clear&&o.clear(),f={name:t,fields:u,dirty:!1,valid:!1,validating:!1,_validatingQueue:[],getValues:function(){return r.mapValues(this.fields,function(e){return e.value})},setDirty:function(e){return null==e&&(e=!0),r.forIn(this.fields,function(n){return a(n,"dirty",e)}),a(this,"dirty",e),this},check:function(){return new Promise(function(e){return function(n,t){return e.validating?t():e.valid?n(e.getValues()):(e.setDirty(!0),t())}}(this))},clear:function(){return r.forIn(this.fields,function(e){var n;return null!=(n=e.watcher)&&"function"==typeof n.unwatch?n.unwatch():void 0}),this.setDirty(!1)}},this[t]=f,r.forIn(u,function(t){return function(i,u){var o,l;return e.set(i,"dirty",!1),e.set(i,"valid",!1),e.set(i,"errors",{}),e.set(i,"required",!1),e.set(i,"_resolvedRules",s(i)),o=[],r.forIn(i._resolvedRules,function(e){var t;if(t=i.customRules&&i.customRules[e.name]||n.rules[e.name],t.sensitive)return o.push(i),!1}),l={path:function(){return i.value},handler:function(e,n){return c(i),a(i,"dirty",!0),a(f,"dirty",!0),r.forEach(o,function(e){return c(e)})}},l.unwatch=t.$watch(l.path,l.handler),e.set(i,"watcher",l)}}(this)),r.forIn(u,function(e){return c(e)})}}}}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// module.exports.validator = require('./src/vue-data-validator.coffee');
+	// module.exports.options = require('./src/vue-data-validator-options.coffee');
+	module.exports = {
+	  validator:__webpack_require__(3)
+	}
+
+
+/***/ },
+/* 1 */,
+/* 2 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  pull: function(arr, v) {
+	    var index;
+	    index = arr.indexOf(v);
+	    if (index > -1) {
+	      return arr.splice(index, 1);
+	    } else {
+	      return false;
+	    }
+	  },
+	  values: function(obj) {
+	    var j, len, v, values;
+	    values = [];
+	    for (j = 0, len = obj.length; j < len; j++) {
+	      v = obj[j];
+	      values.push(v);
+	    }
+	    return values;
+	  },
+	  findIndex: function(arr, cb) {
+	    var k, key, v;
+	    key = -1;
+	    for (k in arr) {
+	      v = arr[k];
+	      if (cb(v, k)) {
+	        key = k;
+	        break;
+	      }
+	    }
+	    return k;
+	  },
+	  has: function(obj, k) {
+	    return obj.hasOwnProperty(k);
+	  },
+	  mapValues: function(obj, cb) {
+	    var k, v, values;
+	    values = {};
+	    for (k in obj) {
+	      v = obj[k];
+	      values[k] = cbj(v, k);
+	    }
+	    return values;
+	  },
+	  forEach: function(arr, cb) {
+	    var k, v;
+	    for (k in arr) {
+	      v = arr[k];
+	      cb(v, k);
+	    }
+	  },
+	  forIn: function(obj, cb) {
+	    var i, k, r, v;
+	    i = 0;
+	    for (k in obj) {
+	      v = obj[k];
+	      r = cb(v, k, i);
+	      i++;
+	      if (r === false) {
+	        break;
+	      }
+	    }
+	  }
+	};
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _, assignIfDifferently, empty, isArray, isBool, isNumber, isObject, isPromise, isString, isset;
+
+	_ = __webpack_require__(2);
+
+	isset = function(v) {
+	  return typeof v !== 'undefined';
+	};
+
+	isBool = function(v) {
+	  return Object.prototype.toString.call(v) === '[object Boolean]';
+	};
+
+	isString = function(v) {
+	  return Object.prototype.toString.call(v) === '[object String]';
+	};
+
+	isNumber = function(v) {
+	  return Object.prototype.toString.call(v) === '[object Number]';
+	};
+
+	isArray = function(v) {
+	  return Object.prototype.toString.call(v) === '[object Array]';
+	};
+
+	isObject = function(v) {
+	  return Object.prototype.toString.call(v) === '[object Object]';
+	};
+
+	isPromise = function(v) {
+	  return Object.prototype.toString.call(v) === '[object Promise]';
+	};
+
+	empty = function(v) {
+	  var i, j, len, v2;
+	  if (!isset(v) || v === null) {
+	    return true;
+	  } else if (isset(v.length)) {
+	    return v.length === 0;
+	  } else if (isBool(v) || isNumber(v)) {
+	    return false;
+	  } else if (isNaN(v)) {
+	    return true;
+	  } else if (isObject(v)) {
+	    i = 0;
+	    for (j = 0, len = v.length; j < len; j++) {
+	      v2 = v[j];
+	      i++;
+	    }
+	    return i === 0;
+	  }
+	};
+
+	assignIfDifferently = function(obj, key, value) {
+	  if (obj[key] !== value) {
+	    return obj[key] = value;
+	  }
+	};
+
+	module.exports = {
+	  install: function(Vue, options) {
+	    Vue.Validator = {
+	      options: options
+	    };
+	    return Vue.prototype.$validate = function(name, fields) {
+	      var oldValidation, resolveRules, validateField, validation;
+	      resolveRules = function(field) {
+	        var arr, k, params, r, rule, rules;
+	        r = {};
+	        if (field.rules) {
+	          rules = field.rules.split('|');
+	          for (k in rules) {
+	            arr = rules[k].split(':');
+	            params = arr[1] ? arr[1].split(',') : [];
+	            rule = arr[0];
+	            if (field.ruleParams && field.ruleParams[rule]) {
+	              params = params.concat(field.ruleParams[rule]);
+	            }
+	            r[rule] = {
+	              name: rule,
+	              params: params
+	            };
+	          }
+	        }
+	        return r;
+	      };
+	      validateField = function(field) {
+	        var addError, compileMessage, queueId, validated;
+	        validated = function(valid) {
+	          var allValid;
+	          assignIfDifferently(field, 'valid', valid);
+	          _.pull(validation._validatingQueue, queueId);
+	          assignIfDifferently(validation, 'validating', validation._validatingQueue.length > 0);
+	          if (!valid) {
+	            return assignIfDifferently(validation, 'valid', valid);
+	          } else {
+	            allValid = _.findIndex(_.values(fields), function(field) {
+	              return !field.valid;
+	            }) === -1;
+	            return assignIfDifferently(validation, 'valid', allValid && !validation.validating);
+	          }
+	        };
+	        addError = function(ruleName, message) {
+	          var errors;
+	          errors = {};
+	          _.forIn(field._resolvedRules, function(v, key) {
+	            if (_.has(field.errors, key)) {
+	              return errors[key] = field.errors[key];
+	            } else if (key === ruleName) {
+	              return errors[ruleName] = {
+	                name: ruleName,
+	                message: message
+	              };
+	            }
+	          });
+	          return field.errors = errors;
+	        };
+	        compileMessage = function(rule) {
+	          var message, nameInMessage, ref, ref1;
+	          message = ((ref = field.messages) != null ? ref[rule.name] : void 0) || options.messages[rule.name] || 'No error message for :name.';
+	          nameInMessage = field.nameInMessage || ((ref1 = field.text) != null ? ref1.toString().toLowerCase() : void 0) || field.name;
+	          message = message.replace(/:name/g, nameInMessage);
+	          _.forIn(rule.params, function(v, i) {
+	            var reg;
+	            reg = new RegExp(':params\\[' + i + '\\]', 'g');
+	            return message = message.replace(reg, rule.params[i]);
+	          });
+	          return message;
+	        };
+	        queueId = {};
+	        validation._validatingQueue.push(queueId);
+	        assignIfDifferently(validation, 'validating', true);
+	        field.errors = {};
+	        return _.forIn(field._resolvedRules, function(rule) {
+	          var ref, ruleHandler, ruleObj, valid;
+	          ruleObj = ((ref = field.customRules) != null ? ref[rule.name] : void 0) || options.rules[rule.name];
+	          ruleHandler = ruleObj.handler || ruleObj;
+	          if (ruleObj.always || !empty(field.value)) {
+	            valid = ruleHandler(field.value, rule.params, field, fields);
+	            valid = isPromise(valid) ? valid : (valid ? Promise.resolve() : Promise.reject());
+	            return valid.then(function() {
+	              return validated(true);
+	            })["catch"](function() {
+	              validated(false);
+	              return addError(rule.name, compileMessage(rule));
+	            });
+	          }
+	        });
+	      };
+	      oldValidation = this[name];
+	      if ((oldValidation != null) && (oldValidation.clear != null)) {
+	        oldValidation.clear();
+	      }
+	      validation = {
+	        name: name,
+	        fields: fields,
+	        dirty: false,
+	        valid: false,
+	        validating: false,
+	        _validatingQueue: [],
+	        getValues: function() {
+	          return _.mapValues(this.fields, function(v) {
+	            return v.value;
+	          });
+	        },
+	        setDirty: function(to) {
+	          if (to == null) {
+	            to = true;
+	          }
+	          _.forIn(this.fields, function(v) {
+	            return assignIfDifferently(v, 'dirty', to);
+	          });
+	          assignIfDifferently(this, 'dirty', to);
+	          return this;
+	        },
+	        check: function() {
+	          return new Promise((function(_this) {
+	            return function(resolve, reject) {
+	              if (_this.validating) {
+	                return reject();
+	              } else if (!_this.valid) {
+	                _this.setDirty(true);
+	                return reject();
+	              } else {
+	                return resolve(_this.getValues());
+	              }
+	            };
+	          })(this));
+	        },
+	        clear: function() {
+	          _.forIn(this.fields, function(v) {
+	            var ref;
+	            return (ref = v.watcher) != null ? typeof ref.unwatch === "function" ? ref.unwatch() : void 0 : void 0;
+	          });
+	          return this.setDirty(false);
+	        }
+	      };
+	      this[name] = validation;
+	      _.forIn(fields, (function(_this) {
+	        return function(field, key) {
+	          var sensitiveFields, watcher;
+	          Vue.set(field, 'dirty', false);
+	          Vue.set(field, 'valid', false);
+	          Vue.set(field, 'errors', {});
+	          Vue.set(field, 'required', false);
+	          Vue.set(field, '_resolvedRules', resolveRules(field));
+	          sensitiveFields = [];
+	          _.forIn(field._resolvedRules, function(rule) {
+	            var ruleObj;
+	            ruleObj = (field.customRules && field.customRules[rule.name]) || options.rules[rule.name];
+	            if (ruleObj.sensitive) {
+	              sensitiveFields.push(field);
+	              return false;
+	            }
+	          });
+	          watcher = {
+	            path: function() {
+	              return field.value;
+	            },
+	            handler: function(val, newVal) {
+	              validateField(field);
+	              assignIfDifferently(field, 'dirty', true);
+	              assignIfDifferently(validation, 'dirty', true);
+	              return _.forEach(sensitiveFields, function(field) {
+	                return validateField(field);
+	              });
+	            }
+	          };
+	          watcher.unwatch = _this.$watch(watcher.path, watcher.handler);
+	          return Vue.set(field, 'watcher', watcher);
+	        };
+	      })(this));
+	      return _.forIn(fields, function(field) {
+	        return validateField(field);
+	      });
+	    };
+	  }
+	};
+
+
+/***/ }
+/******/ ]);
