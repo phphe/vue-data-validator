@@ -1,5 +1,5 @@
 # if you use lodash, can remove this
-_ = require './lodash.custom.coffee'
+_ = require './lodash.custom.js'
 # functions
 isset = (v) -> typeof v != 'undefined'
 isBool = (v) -> Object.prototype.toString.call(v) == '[object Boolean]'
@@ -171,9 +171,23 @@ module.exports = {
     if Vue.prototype.$generateFields?
       oldFunc = Vue.prototype.$generateFields
     Vue.generateFields = Vue.prototype.$generateFields = (fields) ->
+      titleCase = (str) ->
+        studlyCase = (str) ->
+          str[0].toUpperCase() + str.substr(1)
+        camelCase = (str) ->
+          temp = str.toString().split('_')
+          i = 1
+          while i < temp.length
+            temp[i] = studlyCase(temp[i])
+            i++
+          temp.join ''
+        camelToWords = (str) ->
+          str.toString().trim().split /(?=[A-Z])/
+        return camelToWords(studlyCase(camelCase(str))).join(' ').replace /\bid\b/ig, 'ID'
       fields = oldFunc(fields) if oldFunc?
       for key, field of fields
         field.name = key
+        field.text ?= titleCase(field.name)
         field.value ?= null
       return fields
 }

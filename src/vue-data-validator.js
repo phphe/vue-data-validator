@@ -2,7 +2,7 @@
 (function() {
   var _, assignIfDifferently, empty, isArray, isBool, isNumber, isObject, isPromise, isString, isset;
 
-  _ = require('./lodash.custom.js');
+  _ = require('./lodash.custom.coffee');
 
   isset = function(v) {
     return typeof v !== 'undefined';
@@ -59,10 +59,11 @@
 
   module.exports = {
     install: function(Vue, options) {
+      var oldFunc;
       Vue.Validator = {
         options: options
       };
-      return Vue.prototype.$validate = function(name, fields) {
+      Vue.prototype.$validate = function(name, fields) {
         var oldValidation, resolveRules, validateField, validation;
         resolveRules = function(field) {
           var arr, k, params, r, rule, rules;
@@ -118,7 +119,7 @@
           };
           compileMessage = function(rule) {
             var message, nameInMessage, ref, ref1;
-            message = ((ref = field.messages) != null ? ref[rule.name] : void 0) || options.messages[rule.name] || 'No error message for :name.';
+            message = ((ref = field.messages) != null ? ref[rule.name] : void 0) || Vue.Validator.options.messages[rule.name] || 'No error message for :name.';
             nameInMessage = field.nameInMessage || ((ref1 = field.text) != null ? ref1.toString().toLowerCase() : void 0) || field.name;
             message = message.replace(/:name/g, nameInMessage);
             _.forIn(rule.params, function(v, i) {
@@ -134,7 +135,7 @@
           field.errors = {};
           return _.forIn(field._resolvedRules, function(rule) {
             var ref, ruleHandler, ruleObj, valid;
-            ruleObj = ((ref = field.customRules) != null ? ref[rule.name] : void 0) || options.rules[rule.name];
+            ruleObj = ((ref = field.customRules) != null ? ref[rule.name] : void 0) || Vue.Validator.options.rules[rule.name];
             ruleHandler = ruleObj.handler || ruleObj;
             if (ruleObj.always || !empty(field.value)) {
               valid = ruleHandler(field.value, rule.params, field, fields);
@@ -208,7 +209,7 @@
             sensitiveFields = [];
             _.forIn(field._resolvedRules, function(rule) {
               var ruleObj;
-              ruleObj = (field.customRules && field.customRules[rule.name]) || options.rules[rule.name];
+              ruleObj = (field.customRules && field.customRules[rule.name]) || Vue.Validator.options.rules[rule.name];
               if (ruleObj.sensitive) {
                 sensitiveFields.push(field);
                 return false;
@@ -234,6 +235,46 @@
         return _.forIn(fields, function(field) {
           return validateField(field);
         });
+      };
+      if (Vue.prototype.$generateFields != null) {
+        oldFunc = Vue.prototype.$generateFields;
+      }
+      return Vue.generateFields = Vue.prototype.$generateFields = function(fields) {
+        var field, key, titleCase;
+        titleCase = function(str) {
+          var camelCase, camelToWords, studlyCase;
+          studlyCase = function(str) {
+            return str[0].toUpperCase() + str.substr(1);
+          };
+          camelCase = function(str) {
+            var i, temp;
+            temp = str.toString().split('_');
+            i = 1;
+            while (i < temp.length) {
+              temp[i] = studlyCase(temp[i]);
+              i++;
+            }
+            return temp.join('');
+          };
+          camelToWords = function(str) {
+            return str.toString().trim().split(/(?=[A-Z])/);
+          };
+          return camelToWords(studlyCase(camelCase(str))).join(' ').replace(/\bid\b/ig, 'ID');
+        };
+        if (oldFunc != null) {
+          fields = oldFunc(fields);
+        }
+        for (key in fields) {
+          field = fields[key];
+          field.name = key;
+          if (field.text == null) {
+            field.text = titleCase(field.name);
+          }
+          if (field.value == null) {
+            field.value = null;
+          }
+        }
+        return fields;
       };
     }
   };
