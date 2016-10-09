@@ -11,10 +11,10 @@
       }
     },
     values: function(obj) {
-      var j, len, v, values;
+      var k, v, values;
       values = [];
-      for (j = 0, len = obj.length; j < len; j++) {
-        v = obj[j];
+      for (k in obj) {
+        v = obj[k];
         values.push(v);
       }
       return values;

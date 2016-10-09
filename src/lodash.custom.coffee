@@ -8,7 +8,7 @@ module.exports =
       return false
   values: (obj) ->
     values= []
-    values.push v for v in obj
+    values.push v for k, v of obj
     return values
   findIndex: (arr, cb) ->
     key = -1

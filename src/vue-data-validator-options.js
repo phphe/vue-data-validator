@@ -39,7 +39,7 @@
   };
 
   empty = function(v) {
-    var i, j, len1, v2;
+    var i, k;
     if (!isset(v) || v === null) {
       return true;
     } else if (isset(v.length)) {
@@ -50,8 +50,7 @@
       return true;
     } else if (isObject(v)) {
       i = 0;
-      for (j = 0, len1 = v.length; j < len1; j++) {
-        v2 = v[j];
+      for (k in v) {
         i++;
       }
       return i === 0;

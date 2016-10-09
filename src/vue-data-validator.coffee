@@ -19,7 +19,7 @@ empty = (v) ->
     return true
   else if isObject(v)
     i = 0
-    i++ for v2 in v
+    i++ for k of v
     return i == 0
 assignIfDifferently = (obj, key, value) ->
   if obj[key] isnt value then obj[key] = value
