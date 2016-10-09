@@ -73,7 +73,7 @@ module.exports = {
           field.errors = errors
 
         compileMessage = (rule) ->
-          message = field.messages?[rule.name] or options.messages[rule.name] or 'No error message for :name.'
+          message = field.messages?[rule.name] or Vue.Validator.options.messages[rule.name] or 'No error message for :name.'
           nameInMessage = field.nameInMessage or field.text?.toString().toLowerCase() or field.name
           message = message.replace(/:name/g, nameInMessage)
           _.forIn(rule.params, (v, i) ->
@@ -90,7 +90,7 @@ module.exports = {
         #
         field.errors = {}
         _.forIn(field._resolvedRules, (rule) ->
-          ruleObj = field.customRules?[rule.name] || options.rules[rule.name]
+          ruleObj = field.customRules?[rule.name] || Vue.Validator.options.rules[rule.name]
           ruleHandler = ruleObj.handler || ruleObj
           if ruleObj.always || !empty(field.value)
             valid = ruleHandler(field.value, rule.params, field, fields)
@@ -145,7 +145,7 @@ module.exports = {
         # find field has sensitive rule
         sensitiveFields = []
         _.forIn(field._resolvedRules, (rule) ->
-          ruleObj = (field.customRules && field.customRules[rule.name]) || options.rules[rule.name]
+          ruleObj = (field.customRules && field.customRules[rule.name]) || Vue.Validator.options.rules[rule.name]
           if ruleObj.sensitive
             sensitiveFields.push(field)
             return false
@@ -167,4 +167,13 @@ module.exports = {
       )
       # validate all at first
       _.forIn(fields, (field) -> validateField(field))
+    # helper method: generateFields
+    if Vue.prototype.$generateFields?
+      oldFunc = Vue.prototype.$generateFields
+    Vue.generateFields = Vue.prototype.$generateFields = (fields) ->
+      fields = oldFunc(fields) if oldFunc?
+      for key, field of fields
+        field.name = key
+        field.value ?= null
+      return fields
 }
