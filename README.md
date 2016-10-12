@@ -129,8 +129,8 @@ show in error message
 ### nameInMessage [String]
 show in error message instead of 'text' if exists
 ### rules [String]
-format: 'ruleName:param1,param2|ruleName2|...'\
-example: 'required|email|minLength:3'\
+format: 'ruleName:param1,param2|ruleName2|...'  
+example: 'required|email|minLength:3'  
 you can put parm in ruleParams
 ### ruleParams [Object]
 eg:
@@ -182,11 +182,11 @@ options: {
 # API for rule
 You can check './src/vue-data-validator-options.js/coffee'.
 ### handler [Function]
-validate a value\
+validate a value  
 params: value, params, field, fields
 return Boolean or Promise
 ### always [Boolean] [default: false]
-when the state 'required' of a field is false, it will not be validate by a rule expect the 'always' is true.\
+when the state 'required' of a field is false, it will not be validate by a rule expect the 'always' is true.  
 so it's suit for 'reuqired' or 'requiredWith' rule. remember change state 'required' in some rule. And important, you should put these rules which maybe change 'required' at the front.
 eg:
 ```
@@ -336,8 +336,8 @@ this.validation.check().then(function (values) {
 ### nameInMessage [String]
 如果设置了，就在错误消息中显示。优先级高于text
 ### rules [String]
-格式: 'ruleName:param1,param2|ruleName2|...'\
-example: 'required|email|minLength:3'\
+格式: 'ruleName:param1,param2|ruleName2|...'  
+example: 'required|email|minLength:3'  
 一些特殊情况（参数包含特殊字符，参数不是字符串），也可以把参数放到 ruleParams 中
 ### ruleParams [Object]
 eg:
@@ -389,8 +389,8 @@ options: {
 # API 规则
 可以浏览 './src/vue-data-validator-options.js/coffee'.很简单的
 ### handler [Function]
-验证方法\
-参数: value, params, field, fields\
+验证方法  
+参数: value, params, field, fields  
 返回布尔（立即完成）或promise（异步验证）
 ### always [Boolean] [default: false]
 首先，字段是否必需不直接设置，而是由验证方法改变。比如’required‘规则将每次把‘必需’设置成true，requiredWith 规则某些情况下把’必需‘设置为true。然而，当一个字段是非必需时，会跳过规则。
