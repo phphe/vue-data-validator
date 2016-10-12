@@ -109,7 +109,7 @@ unimportant
 ### setDirty [Function]
 set state 'dirty' of all fields and validation object to specified.
 ### clear [Function]
-clear validated states and set all dirty to false
+set 'dirty, reuqired' of all fields to false. unwatch all watchers.
 ### check [Function]
 check is all valid, return a promise.
 ```
@@ -316,7 +316,7 @@ fields: {
 ### setDirty [Function]
 设置所有字段和验证对象的dirty为指定值
 ### clear [Function]
-清除所有验证状态，watcher，设置dirty->false
+清除所有验证状态，watcher，设置dirty->false, required->false.
 ### check [Function]
 检查所有是否通过，返回一个promise对象（如果当前正在验证中，也算不通过）
 ```

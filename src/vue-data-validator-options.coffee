@@ -1,5 +1,5 @@
 # if you use lodash, can remove this
-_ = require './lodash.custom.coffee'
+_ = require './lodash.custom.js'
 # functons
 isset = (v) -> typeof v != 'undefined'
 isBool = (v) -> Object.prototype.toString.call(v) == '[object Boolean]'

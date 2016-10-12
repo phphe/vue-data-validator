@@ -129,7 +129,11 @@ module.exports = {
             else resolve(this.getValues())
           )
         clear: ->
-          _.forIn(this.fields, (v) -> v.watcher?.unwatch?())
+          _(this.fields).forIn((field) =>
+            field.watcher?.unwatch?()
+            field.required = false
+            return
+          )
           this.setDirty(false)
       }
       # attach validation to vm

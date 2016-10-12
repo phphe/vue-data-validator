@@ -2,7 +2,7 @@
 (function() {
   var _, assignIfDifferently, empty, isArray, isBool, isNumber, isObject, isPromise, isString, isset;
 
-  _ = require('./lodash.custom.coffee');
+  _ = require('./lodash.custom.js');
 
   isset = function(v) {
     return typeof v !== 'undefined';
@@ -190,10 +190,17 @@
             })(this));
           },
           clear: function() {
-            _.forIn(this.fields, function(v) {
-              var ref;
-              return (ref = v.watcher) != null ? typeof ref.unwatch === "function" ? ref.unwatch() : void 0 : void 0;
-            });
+            _(this.fields).forIn((function(_this) {
+              return function(field) {
+                var ref;
+                if ((ref = field.watcher) != null) {
+                  if (typeof ref.unwatch === "function") {
+                    ref.unwatch();
+                  }
+                }
+                field.required = false;
+              };
+            })(this));
             return this.setDirty(false);
           }
         };
