@@ -1,7 +1,7 @@
 # vue-data-validator
 [中文文档](#ChineseDoc)
 
-A validator for Vue.js 2.0. It bases on data instead of html. With common rules.\
+A validator for Vue.js 2.0. It bases on data instead of html. With common rules.  
 Vue.js 2.0的数据验证插件，规则不写在模板里而是代码里。语法是仿laravel的。包含常用规则。我的第一个vue插件，请大方赞。
 # Installation
 ```sh
