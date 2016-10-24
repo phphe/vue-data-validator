@@ -1,5 +1,6 @@
 # vue-data-validator
 [中文文档](#ChineseDoc)
+[中文：验证相关流程](#Chinese-validation-process)
 
 A validator for Vue.js 2.0. It bases on data instead of html. With common rules.  
 Vue.js 2.0的数据验证插件，规则不写在模板里而是代码里。语法是仿laravel的。包含常用规则。我的第一个vue插件，请大方赞。
@@ -33,7 +34,7 @@ Vue.use(VueDataValidator, yourOptions)
           .help-block(v-for="error in fields.password.errors") {{error.message}}
 
       .form-group
-        button.btn.btn-primary(type="submit", :disabled="!validation.valid") Sign in
+        button.btn.btn-primary(type="submit", :disabled="!validation.valid || validation.validating") Sign in
 </template>
 
 <script>
@@ -41,19 +42,19 @@ module.exports = {
   data: function() {
     return {
       validation: '',
-      fields: this.$generateFields({
+      fields: {
         email: {
           rules: 'required|email|minLength:3'
         },
         password: {
           rules: 'required'
         }
-      })
+      }
     };
   },
   methods: {
     submit: function() {
-      this.validation.check().then(function () {
+      this.validation.check().then(function (values) {
         // submit
       }).catch(function () {
         // invalid
@@ -72,39 +73,11 @@ module.exports = {
 It contains options. You can add rules or message to Vue.Validator.options.
 ### Vue.prototype.$validate [Function]
 params: name(contain fields states and functions), fields
-### Vue.generateFields, Vue.prototype.$generateFields [Function]
-Help for generate fields:
-```
-fields: this.$generateFields({
-        email: {
-          rules: 'required|email|minLength:3'
-        },
-        password: {
-          rules: 'required'
-        }
-      })
-//
-fields: {
-    email: {
-      name: 'email',
-      text: 'Email',
-      value: null,
-      rules: 'required|email|minLength:3'
-    },
-    password: {
-      name: 'password',
-      text: 'Password',
-      value: null,
-      rules: 'required'
-    },
-}
-```
 # API for validation states
 ### valid [Boolean]
 ### dirty [Boolean]
 ### fields [Object]
 ### validating [Boolean]
-unimportant
 ### name [String]
 ### setDirty [Function]
 set state 'dirty' of all fields and validation object to specified.
@@ -162,7 +135,7 @@ messages: {
 ### valid [Boolean]
 ### dirty [Boolean]
 ### required [Boolean]
-it needs to be assigned by a rule handler.
+it is not necessary to assign.
 ### errors [Object]
 errors: {
  required: {
@@ -180,14 +153,18 @@ options: {
   }
 }
 # API for rule
-You can check './src/vue-data-validator-options.js/coffee'.
+You can check './src/vue-data-validator-options.js'.
 ### handler [Function]
 validate a value  
 params: value, params, field, fields
 return Boolean or Promise
-### always [Boolean] [default: false]
-when the state 'required' of a field is false, it will not be validate by a rule expect the 'always' is true.  
-so it's suit for 'reuqired' or 'requiredWith' rule. remember change state 'required' in some rule. And important, you should put these rules which maybe change 'required' at the front.
+### required [Boolean/Function] Optional
+it determines if a field is required
+it can be Boolean
+also function
+return Boolean or Promise
+if it return a Promise, the result should pass to resolve
+Important, you should put these rules which maybe has 'required' at the front.
 eg:
 ```
 email: {
@@ -203,7 +180,7 @@ when a field's value changed, it will be validated. And other fields which with 
     required: 'The :name must be accepted.'
  }
  ```
-message is a string, :name will be replaced to field nameInMessage/text/name, :param[0] will be replaced to first param, :param[n] will ...
+message is a string, :name will be replaced to field nameInMessage/text/name, :param[0] will be replaced to first param, :param[n] will be replaced to n param
 
 <a name="ChineseDoc"></a>
 #中文文档
@@ -238,7 +215,7 @@ Vue.use(VueDataValidator, yourOptions)
           .help-block(v-for="error in fields.password.errors") {{error.message}}
 
       .form-group
-        button.btn.btn-primary(type="submit", :disabled="!validation.valid") Sign in
+        button.btn.btn-primary(type="submit", :disabled="!validation.valid || validation.validating") Sign in
 </template>
 
 <script>
@@ -246,19 +223,19 @@ module.exports = {
   data: function() {
     return {
       validation: '',
-      fields: this.$generateFields({
+      fields: {
         email: {
           rules: 'required|email|minLength:3'
         },
         password: {
           rules: 'required'
         }
-      })
+      }
     };
   },
   methods: {
     submit: function() {
-      this.validation.check().then(function () {
+      this.validation.check().then(function (values) {
         // submit
       }).catch(function () {
         // invalid
@@ -277,41 +254,12 @@ module.exports = {
 包含全局设置。可以直接添加规则个错误消息模板到 Vue.Validator.options.
 ### Vue.prototype.$validate [Function]
 参数: name(验证对象在vue实例上的名字，验证对象包含验证的几个字段的综合状态，和一些方法), fields(验证字段集：对象类型)
-### Vue.generateFields, Vue.prototype.$generateFields [Function]
-生成字段集的帮助方法:
-```
-懒人写法
-fields: this.$generateFields({
-        email: {
-          rules: 'required|email|minLength:3'
-        },
-        password: {
-          rules: 'required'
-        }
-      })
-//
-完整写法
-fields: {
-    email: {
-      name: 'email',
-      text: 'Email',
-      value: null,
-      rules: 'required|email|minLength:3'
-    },
-    password: {
-      name: 'password',
-      text: 'Password',
-      value: null,
-      rules: 'required'
-    },
-}
-```
 # API 验证对象
 ### valid [Boolean]
 ### dirty [Boolean]
 ### fields [Object]
 ### validating [Boolean]
-验证中，用于异步验证，不需使用
+验证中，用于异步验证
 ### name [String]
 ### setDirty [Function]
 设置所有字段和验证对象的dirty为指定值
@@ -369,7 +317,7 @@ messages: {
 ### valid [Boolean]
 ### dirty [Boolean]
 ### required [Boolean]
-此状态需要被一些特殊规则验证时修改，参考附带规则
+此状态一般无需手动指定，特殊规则（required, requiredWith...）讲影响它的值
 ### errors [Object]
 errors: {
  required: {
@@ -387,14 +335,17 @@ options: {
   }
 }
 # API 规则
-可以浏览 './src/vue-data-validator-options.js/coffee'.很简单的
+可以浏览 './src/vue-data-validator-options.js'.很简单的
 ### handler [Function]
 验证方法  
 参数: value, params, field, fields  
 返回布尔（立即完成）或promise（异步验证）
-### always [Boolean] [default: false]
-首先，字段是否必需不直接设置，而是由验证方法改变。比如’required‘规则将每次把‘必需’设置成true，requiredWith 规则某些情况下把’必需‘设置为true。然而，当一个字段是非必需时，会跳过规则。
-always为true可以防止跳过。每次验证该字段时总是不跳过该规则。重要的是，改变’必需‘将影响后面的规则是否跳过，所以 required 规则或类似规则应总是写在前面。
+### required [Boolean/Function] 可选
+特殊规则才有必要拥有此项，它决定一个字段是否必需
+可以为布尔值或方法
+当它是方法时，返回一个布尔或promise
+如果返回promise，则需把结果传给resolve，结果为布尔，则影响字段的“required”,为null，则不影响
+重要的是，改变’必需属性‘将影响后面规则的验证，所以 required 规则或类似规则应总是写在前面。
 eg:
 ```
 email: {
@@ -411,3 +362,13 @@ email: {
  }
  ```
  模板是字符串，包含占位符。:name 表示字段的名（nameInMessage > text）。：param[n] 代表第n个参数。
+ <a name="Chinese-validation-process"></a>
+
+# 验证相关流程
+### \$validate函数的执行过程
+多个字段的验证结果将存储在一个组件的第一层子属性上，所以需要预定义验证对象，然后在使用$validate时需要验证对象的名字。this.$validate('验证对象名（一层）', 字段集对象)  
+然后将根据名字寻找老的验证对象，如果存在，则清除
+然后生成验证对象，补全字段属性，把字段规则解析为对象并存储，找出并存储敏感字段。附加验证对象到组件实例，并开始观察字段值的改变。  
+当一个字段值改变时，此字段将会被验证。其它非敏感字段不会被验证。敏感字段：含有敏感规则。  
+### 验证流程
+为了异步验证机制，验证采用的线性验证。验证一个字段时，按顺序验证每个规则，一个规则验证完才会验证下一个。首先查看规则是否有required属性，然后按情况可能更改字段的required属性。然后如果字段非必需且为空，则不验证，跳到下一个规则。验证时字段和验证对象的的validating将是true，每次验证将会有id标明该验证，所以异步验证时，之前的验证结果将不会生效。

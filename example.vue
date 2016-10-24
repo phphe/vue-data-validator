@@ -13,7 +13,7 @@
           .help-block(v-for="error in fields.password.errors") {{error.message}}
 
       .form-group
-        button.btn.btn-primary(type="submit", :disabled="!validation.valid") Sign in
+        button.btn.btn-primary(type="submit", :disabled="!validation.valid || validation.validating") Sign in
 </template>
 
 <script>
@@ -21,14 +21,14 @@ module.exports = {
   data: function() {
     return {
       validation: '',
-      fields: this.$generateFields({
+      fields: {
         email: {
           rules: 'required|email|minLength:3'
         },
         password: {
           rules: 'required'
         }
-      })
+      }
     };
   },
   methods: {
