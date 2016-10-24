@@ -1,5 +1,5 @@
 # vue-data-validator
-[中文文档](#ChineseDoc)
+[中文文档](#ChineseDoc)  
 [中文：验证相关流程](#Chinese-validation-process)
 
 A validator for Vue.js 2.0. It bases on data instead of html. With common rules.  
