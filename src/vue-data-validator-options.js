@@ -1,5 +1,5 @@
 // the asynchronous rules(remoteCheck...) need vue-resource
-import Vue from 'vue'
+var Vue = require('vue')
 //
 const rules = {
   accepted: function(val) {
@@ -158,7 +158,7 @@ const options = {
   rules,
   messages
 }
-export default options
+module.exports = options
 // functions
 function isArray(obj) {
   return Object.prototype.toString.call(obj) === '[object Array]'

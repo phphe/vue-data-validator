@@ -1,4 +1,4 @@
-const validator = {
+var validator = {
   options: {},
   add(rules, messages) {
     if (!messages) messages = {}
@@ -11,7 +11,7 @@ const validator = {
     Vue.prototype.$validate = function (name, fields) { return validate(name, fields, this) }
   }
 }
-export default validator
+module.exports = validator
 function validate(name, fields, vm) {
   // clear old validation
   vm[name] && vm[name].clear && vm[name].clear()

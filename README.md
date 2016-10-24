@@ -4,6 +4,8 @@
 
 A validator for Vue.js 2.0. It bases on data instead of html. With common rules.  
 Vue.js 2.0的数据验证插件，规则不写在模板里而是代码里。语法是仿laravel的。包含常用规则。我的第一个vue插件，请大方赞。
+# dependencies
+some features depend on babel-polyfill
 # Installation
 ```sh
 $ npm install vue-data-validator
@@ -185,6 +187,8 @@ message is a string, :name will be replaced to field nameInMessage/text/name, :p
 <a name="ChineseDoc"></a>
 #中文文档
 Vue.js 2.0的数据验证插件，规则不写在模板里而是代码里。语法是仿laravel的。包含常用规则。我的第一个vue插件，请大方赞。
+# 依赖
+最好引入 babel-polyfill
 # 安装
 ```sh
 $ npm install vue-data-validator
