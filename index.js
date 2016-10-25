@@ -1,4 +1,6 @@
-module.exports = {
-  validator:require('./src/vue-data-validator.js'),
-  options: require('./src/vue-data-validator-options.js')
+import validator from './src/vue-data-validator.js'
+import options from './src/vue-data-validator-options.js'
+export default {
+  validator,
+  options
 }

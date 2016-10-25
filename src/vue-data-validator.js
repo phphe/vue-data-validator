@@ -1,3 +1,4 @@
+var Vue
 var validator = {
   options: {},
   add(rules, messages) {
@@ -5,13 +6,14 @@ var validator = {
     Object.assign(validator.options.rules, rules)
     Object.assign(validator.options.messages, messages)
   },
-  install(Vue, options) {
+  install(Vue2, options) {
+    Vue = Vue2
     Vue.validator = Vue.prototype.$validator = validator
     if (options) validator.options = options
     Vue.prototype.$validate = function (name, fields) { return validate(name, fields, this) }
   }
 }
-module.exports = validator
+export default validator
 function validate(name, fields, vm) {
   // clear old validation
   vm[name] && vm[name].clear && vm[name].clear()
@@ -48,7 +50,7 @@ function validateField(field, validation) {
     let required = field.required
     if (isRequired != null) {
       if (typeof isRequired !== 'function') isRequired = () => rule.rule.required
-      required = isRequired(field.value, rule.params, field, validation.fields, validation)
+      required = isRequired(field.value, rule.params, field, validation.fields, validation, Vue)
     }
     if (!isPromise(required)) required = Promise.resolve(required)
     // validate if necessarily, and call next
@@ -61,7 +63,7 @@ function validateField(field, validation) {
       }
       //
       if (field.required || !empty(field.value)) {
-        let isValid = rule.rule.handler(field.value, rule.params, field, validation.fields, validation)
+        let isValid = rule.rule.handler(field.value, rule.params, field, validation.fields, validation, Vue)
         if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject()
         isValid.then(() => {
           if (validationId !== field._validationId) return

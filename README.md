@@ -14,7 +14,7 @@ $ npm install vue-data-validator
 const VueDataValidator = require('vue-data-validator')
 Vue.use(VueDataValidator.validator, VueDataValidator.options)
 // or
-const VueDataValidator = require('you-path/vue-data-validator/src/vue-data-validator.js')
+const VueDataValidator = require('you-path/vue-data-validator/dist/validator.common.js')
 Vue.use(VueDataValidator, yourOptions)
 
 ```
@@ -197,7 +197,7 @@ $ npm install vue-data-validator
 const VueDataValidator = require('vue-data-validator')
 Vue.use(VueDataValidator.validator, VueDataValidator.options)
 // 自定义安装，如果你要导入其它的规则和消息模板的话
-const VueDataValidator = require('you-path/vue-data-validator/src/vue-data-validator.js')
+const VueDataValidator = require('you-path/vue-data-validator/dist/validator.common.js')
 Vue.use(VueDataValidator, yourOptions)
 
 ```

@@ -1,5 +1,4 @@
 // the asynchronous rules(remoteCheck...) need vue-resource
-var Vue = require('vue')
 //
 const rules = {
   accepted: function(val) {
@@ -98,7 +97,7 @@ const rules = {
     return isString(val)
   },
   // asynchronous rules
-  remoteCheck: function(val, params) {
+  remoteCheck: function(val, params, field, fields, validation, Vue) {
     if (typeof params[1] !== 'undefined') {
       let expected = isArray(params[1]) ? params[1] : [params[1]]
       if (expected.indexOf(val) > -1) {
@@ -158,7 +157,7 @@ const options = {
   rules,
   messages
 }
-module.exports = options
+export default options
 // functions
 function isArray(obj) {
   return Object.prototype.toString.call(obj) === '[object Array]'
