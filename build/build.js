@@ -70,6 +70,22 @@ rollup.rollup({
   }).code, bundle);
 })
 .catch(logError);
+// options cn
+rollup.rollup({
+  entry: './src/vue-data-validator-options-cn.js',
+  plugins: [
+    babel({
+      presets: ['es2015-loose-rollup']
+    })
+  ]
+})
+.then(function (bundle) {
+  return write('dist/options-cn.common.js', bundle.generate({
+    format: 'cjs',
+    banner: banner
+  }).code, bundle);
+})
+.catch(logError);
 
 function write(dest, code, bundle) {
   return new Promise(function (resolve, reject) {

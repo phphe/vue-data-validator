@@ -3,7 +3,7 @@
 [中文：验证相关流程](#Chinese-validation-process)
 
 A validator for Vue.js 2.0. It bases on data instead of html. With common rules.  
-Vue.js 2.0的数据验证插件，规则不写在模板里而是代码里。语法是仿laravel的。包含常用规则。我的第一个vue插件，请大方赞。
+Vue.js 2.0的数据验证插件，规则不写在模板里而是代码里。语法是仿laravel的。包含常用规则。我的第一个vue插件，请大方赞。已经添加中文错误消息，请查看[中文文档](#ChineseDoc)。
 # dependencies
 some features depend on babel-polyfill
 # Installation
@@ -196,6 +196,10 @@ $ npm install vue-data-validator
 // 普通安装
 const VueDataValidator = require('vue-data-validator')
 Vue.use(VueDataValidator.validator, VueDataValidator.options)
+// 使用中文错误消息
+const VueDataValidator = require('you-path/vue-data-validator/dist/validator.common.js')
+const options = require('you-path/vue-data-validator/dist/options-cn.common.js')
+Vue.use(VueDataValidator, options)
 // 自定义安装，如果你要导入其它的规则和消息模板的话
 const VueDataValidator = require('you-path/vue-data-validator/dist/validator.common.js')
 Vue.use(VueDataValidator, yourOptions)
