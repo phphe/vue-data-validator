@@ -132,8 +132,8 @@ var rules = {
       });
     });
   },
-  remoteNotExisted: function (val, params) {
-    return rules.remoteCheck(val, params);
+  remoteNotExisted: function (val, params, field, fields, validation, Vue) {
+    return rules.remoteCheck(val, params, field, fields, validation, Vue);
   }
 };
 //
