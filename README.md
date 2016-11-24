@@ -99,10 +99,10 @@ return a object contains all values
 # API for field
 ### name [String]
 same to the key
-### text [String]
+### display [String]
 show in error message
 ### nameInMessage [String]
-show in error message instead of 'text' if exists
+show in error message instead of 'display' if exists
 ### rules [String]
 format: 'ruleName:param1,param2|ruleName2|...'  
 example: 'required|email|minLength:3'  
@@ -182,7 +182,7 @@ when a field's value changed, it will be validated. And other fields which with 
     required: 'The :name must be accepted.'
  }
  ```
-message is a string, :name will be replaced to field nameInMessage/text/name, :param[0] will be replaced to first param, :param[n] will be replaced to n param
+message is a string, :name will be replaced to field nameInMessage/display/name, :param[0] will be replaced to first param, :param[n] will be replaced to n param
 
 <a name="ChineseDoc"></a>
 #中文文档
@@ -287,10 +287,10 @@ this.validation.check().then(function (values) {
 # API for field
 ### name [String]
 必需与字段在fields中的key相同
-### text [String]
+### display [String]
 在错误消息中显示
 ### nameInMessage [String]
-如果设置了，就在错误消息中显示。优先级高于text
+如果设置了，就在错误消息中显示。优先级高于display
 ### rules [String]
 格式: 'ruleName:param1,param2|ruleName2|...'  
 example: 'required|email|minLength:3'  
@@ -369,7 +369,7 @@ email: {
     required: 'The :name must be accepted.'
  }
  ```
- 模板是字符串，包含占位符。:name 表示字段的名（nameInMessage > text）。：param[n] 代表第n个参数。
+ 模板是字符串，包含占位符。:name 表示字段的名（nameInMessage > display > name）。：param[n] 代表第n个参数。
  <a name="Chinese-validation-process"></a>
 
 # 验证相关流程

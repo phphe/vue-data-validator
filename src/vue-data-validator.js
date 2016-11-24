@@ -96,7 +96,7 @@ function validateField(field, validation) {
 }
 function addError(rule, field, validation) {
   // compile message
-  let nameInMessage = field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed'
+  let nameInMessage = field.nameInMessage || field.display && field.display.toString().toLowerCase() || field.name || 'unnamed'
   let message = rule.message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value)
   for (let i in rule.params) {
     let reg = new RegExp(':params\\[' + i + '\\]', 'g')
@@ -208,6 +208,9 @@ function initFields(validation, vm) {
     let field = validation.fields[key]
     // necessarily property
     if (!field.name) vm.$set(field, 'name', key)
+    else if (field.name !== key) {
+      throw Error('The field name must be same with its key.')
+    }
     if (typeof field.value === 'undefined') vm.$set(field, 'value', null)
     // add state to field
     vm.$set(field, 'dirty', false)
