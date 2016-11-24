@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v1.2.4
+ * vue-data-validator v1.2.7
  * https://github.com/phphe/vue-data-validator
  * Released under the MIT License.
  */
@@ -127,7 +127,7 @@ function validateField(field, validation) {
 }
 function addError(rule, field, validation) {
   // compile message
-  var nameInMessage = field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed';
+  var nameInMessage = field.nameInMessage || field.display && field.display.toString().toLowerCase() || field.name || 'unnamed';
   var message = rule.message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
   for (var i in rule.params) {
     var reg = new RegExp(':params\\[' + i + '\\]', 'g');
@@ -261,7 +261,9 @@ function initFields(validation, vm) {
   var _loop = function (key) {
     var field = validation.fields[key];
     // necessarily property
-    if (!field.name) vm.$set(field, 'name', key);
+    if (!field.name) vm.$set(field, 'name', key);else if (field.name !== key) {
+      throw Error('The field name must be same with its key.');
+    }
     if (typeof field.value === 'undefined') vm.$set(field, 'value', null);
     // add state to field
     vm.$set(field, 'dirty', false);

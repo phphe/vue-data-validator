@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v1.2.4
+ * vue-data-validator v1.2.7
  * https://github.com/phphe/vue-data-validator
  * Released under the MIT License.
  */
