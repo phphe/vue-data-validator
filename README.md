@@ -1,3 +1,4 @@
+# This doc is deprecated
 # vue-data-validator
 [中文文档](#ChineseDoc)  
 [中文：验证相关流程](#Chinese-validation-process)

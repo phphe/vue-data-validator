@@ -1,8 +1,7 @@
 var fs = require('fs')
 var path = require('path')
 var rollup = require('rollup')
-var resolve = require('rollup-plugin-node-resolve')
-var uglify = require('rollup-plugin-uglify')
+// var uglify = require('uglify-js');
 var babel = require('rollup-plugin-babel')
 var _package = require('../package.json')
 var banner =
@@ -24,47 +23,6 @@ function rollupDir(dir, outputDir) {
 }
 function rollupFile(filePath, outputDir) {
   const name = path.parse(filePath).name
-  // umd
-  var temp = path.relative(path.resolve('./src'), path.resolve(filePath)).replace('/', '_').replace('\\', '_')
-  var moduleName = camelCase(_package.name + '_' + temp)
-  if (moduleName === 'vueDataValidatorVueDataValidator') moduleName = 'vueDataValidator'
-  rollup.rollup({
-    entry: filePath,
-    plugins: [
-      babel({
-        presets: ['es2015-loose-rollup']
-      }),
-      // to include dependencies
-      resolve()
-    ]
-  })
-  .then(function (bundle) {
-    return write(`${outputDir}/${name}.js`, bundle.generate({
-      format: 'umd',
-      banner: banner,
-      moduleName: moduleName
-    }).code, bundle)
-  })
-  // umd min.js
-  rollup.rollup({
-    entry: filePath,
-    plugins: [
-      babel({
-        presets: ['es2015-loose-rollup']
-      }),
-      // to include dependencies
-      resolve(),
-      uglify()
-    ]
-  })
-  .then(function (bundle) {
-    return write(`${outputDir}/${name}.min.js`, bundle.generate({
-      format: 'umd',
-      banner: banner,
-      moduleName: moduleName
-    }).code, bundle)
-  })
-  // common js
   rollup.rollup({
     entry: filePath,
     plugins: [
@@ -74,9 +32,12 @@ function rollupFile(filePath, outputDir) {
     ]
   })
   .then(function (bundle) {
-    return write(`${outputDir}/${name}.common.js`, bundle.generate({
-      format: 'cjs',
-      banner: banner
+    var temp = path.relative(path.resolve('./src'), path.resolve(filePath)).replace('/', '_').replace('\\', '_')
+    var moduleName = camelCase(_package.name + '_' + temp)
+    return write(`${outputDir}/${name}.js`, bundle.generate({
+      format: 'umd',
+      banner: banner,
+      moduleName: moduleName
     }).code, bundle)
   })
   .catch(logError)
