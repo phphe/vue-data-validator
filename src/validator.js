@@ -74,11 +74,10 @@ export default {
       },
       clear() {
         this.unwatch()
+        this.setDirty(false)
         Object.values(this.fields).forEach((field) => {
           field.required = false
-          field.dirty = false
         })
-        this.dirty = false
         return this
       }
     }

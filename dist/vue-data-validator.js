@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.1
+ * vue-data-validator v2.0.3
  * phphe
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -82,6 +82,8 @@ function objectMap(obj, func) {
   }
   return r;
 }
+
+
 
 // url
 /* eslint-disable */
@@ -260,11 +262,10 @@ var validator = {
       },
       clear: function () {
         this.unwatch();
+        this.setDirty(false);
         Object.values(this.fields).forEach(function (field) {
           field.required = false;
-          field.dirty = false;
         });
-        this.dirty = false;
         return this;
       }
     };

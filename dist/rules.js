@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.1
+ * vue-data-validator v2.0.3
  * phphe
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -71,6 +71,8 @@ function studlyCase(str) {
 
 
 // object
+
+
 
 
 
