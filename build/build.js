@@ -32,7 +32,7 @@ function rollupFile(filePath, outputDir) {
     entry: filePath,
     plugins: [
       babel({
-        presets: ['es2015-loose-rollup']
+        presets: ['es2015-loose-rollup', 'babel-preset-stage-3']
       }),
       // to include dependencies
       resolve()
@@ -50,7 +50,7 @@ function rollupFile(filePath, outputDir) {
     entry: filePath,
     plugins: [
       babel({
-        presets: ['es2015-loose-rollup']
+        presets: ['es2015-loose-rollup', 'babel-preset-stage-3']
       }),
       // to include dependencies
       resolve(),
@@ -69,7 +69,7 @@ function rollupFile(filePath, outputDir) {
     entry: filePath,
     plugins: [
       babel({
-        presets: ['es2015-loose-rollup']
+        presets: ['es2015-loose-rollup', 'babel-preset-stage-3']
       })
     ]
   })

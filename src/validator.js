@@ -182,28 +182,18 @@ export default {
     this.removeFieldAllErrors(field, validation)
     //
     const rules = Object.values(field._resolvedRules)
-    const done = () => {
+    const queue = async () => {
+      for (const rule in rules) {
+        await this.validateRule(rule, field, validation, validationId)
+      }
+    }
+    queue().then(() => true).catch((error) => error.message === 'invalid').then(() => {
       // set state: validating of field
       field._validationId = null
       field.validating = false
       // set state: validating of validation
       validation.validating = Object.values(validation.fields).some(field => field.validating)
-    }
-    const queue = () => {
-      if (rules.length === 0) {
-        done()
-      } else {
-        const rule = rules.shift()
-        this.validateRule(rule, field, validation, validationId).then(() => {
-          if (validationId !== field._validationId) return
-          queue()
-        }).catch((er) => {
-          // failed or expired
-          done()
-        })
-      }
-    }
-    queue()
+    })
   },
   validateRule(rule, field, validation, validationId) {
     //

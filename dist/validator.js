@@ -165,6 +165,108 @@ function waitFor(name, condition) {
   });
 }
 
+var asyncToGenerator = function (fn) {
+  return function () {
+    var gen = fn.apply(this, arguments);
+    return new Promise(function (resolve, reject) {
+      function step(key, arg) {
+        try {
+          var info = gen[key](arg);
+          var value = info.value;
+        } catch (error) {
+          reject(error);
+          return;
+        }
+
+        if (info.done) {
+          resolve(value);
+        } else {
+          return Promise.resolve(value).then(function (value) {
+            step("next", value);
+          }, function (err) {
+            step("throw", err);
+          });
+        }
+      }
+
+      return step("next");
+    });
+  };
+};
+
+
+
+
+
+
+
+
+
+
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
+
 var validator = {
   rules: {},
   messages: {},
@@ -378,7 +480,46 @@ var validator = {
     this.removeFieldAllErrors(field, validation);
     //
     var rules = Object.values(field._resolvedRules);
-    var done = function () {
+    var queue = function () {
+      var _ref = asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+        var rule;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.t0 = regeneratorRuntime.keys(rules);
+
+              case 1:
+                if ((_context.t1 = _context.t0()).done) {
+                  _context.next = 7;
+                  break;
+                }
+
+                rule = _context.t1.value;
+                _context.next = 5;
+                return _this5.validateRule(rule, field, validation, validationId);
+
+              case 5:
+                _context.next = 1;
+                break;
+
+              case 7:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, _this5);
+      }));
+
+      return function queue() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+    queue().then(function () {
+      return true;
+    }).catch(function (error) {
+      return error.message === 'invalid';
+    }).then(function () {
       // set state: validating of field
       field._validationId = null;
       field.validating = false;
@@ -386,22 +527,7 @@ var validator = {
       validation.validating = Object.values(validation.fields).some(function (field) {
         return field.validating;
       });
-    };
-    var queue = function () {
-      if (rules.length === 0) {
-        done();
-      } else {
-        var rule = rules.shift();
-        _this5.validateRule(rule, field, validation, validationId).then(function () {
-          if (validationId !== field._validationId) return;
-          queue();
-        }).catch(function (er) {
-          // failed or expired
-          done();
-        });
-      }
-    };
-    queue();
+    });
   },
   validateRule: function (rule, field, validation, validationId) {
     var _this6 = this;
