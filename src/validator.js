@@ -17,6 +17,7 @@ export default {
     this.initFields(validation, vm)
     // validate all fields at first
     Object.values(fields).forEach(item => this.validateField(item, validation))
+    return validation
   },
   initValidation(validation, fields, vm) {
     const defaultValidation = {
@@ -26,6 +27,7 @@ export default {
       validating: false,
       _sensitiveFields: [],
       vm,
+      isSubmitAble() { return this.valid && !this.validating },
       getValues() { return objectMap(this.fields, item => item.value) },
       setValues(values) {
         for (const key in values) {
@@ -56,9 +58,11 @@ export default {
         Object.values(this.fields).forEach((field) => {
           field.watcher && field.watcher.unwatch && field.watcher.unwatch()
         })
+        return this
       },
       pause() {
         this.unwatch()
+        return this
       },
       'continue'() {
         this.unwatch()
@@ -66,6 +70,7 @@ export default {
           const watcher = field.watcher
           watcher.unwatch = this.vm.$watch(watcher.getValue, watcher.handler)
         })
+        return this
       },
       clear() {
         this.unwatch()
@@ -74,6 +79,7 @@ export default {
           field.dirty = false
         })
         this.dirty = false
+        return this
       }
     }
     for (const key in defaultValidation) {
@@ -97,10 +103,10 @@ export default {
       vm.$set(field, 'required', false)
       vm.$set(field, 'validating', false)
       vm.$set(field, '_resolvedRules', this.resolveRules(field))
-      vm.$set(field, 'errorsVisible', () => {
+      vm.$set(field, 'isValidationErrorsVisible', () => {
         return field.rules && !field.validating && field.dirty && !field.valid
       })
-      vm.$set(field, 'validationClass', () => {
+      vm.$set(field, 'getValidationClass', () => {
         if (field.rules && field.dirty) {
           if (field.validating) {
             return this.validatingClass

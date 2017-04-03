@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v1.2.8
+ * vue-data-validator v2.0.1
  * phphe
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -35,6 +35,7 @@ var validator = {
     Object.values(fields).forEach(function (item) {
       return _this.validateField(item, validation);
     });
+    return validation;
   },
   initValidation: function (validation, fields, vm) {
     var defaultValidation = {
@@ -44,6 +45,9 @@ var validator = {
       validating: false,
       _sensitiveFields: [],
       vm: vm,
+      isSubmitAble: function () {
+        return this.valid && !this.validating;
+      },
       getValues: function () {
         return helperJs.objectMap(this.fields, function (item) {
           return item.value;
@@ -82,9 +86,11 @@ var validator = {
         Object.values(this.fields).forEach(function (field) {
           field.watcher && field.watcher.unwatch && field.watcher.unwatch();
         });
+        return this;
       },
       pause: function () {
         this.unwatch();
+        return this;
       },
       'continue': function () {
         var _this3 = this;
@@ -94,6 +100,7 @@ var validator = {
           var watcher = field.watcher;
           watcher.unwatch = _this3.vm.$watch(watcher.getValue, watcher.handler);
         });
+        return this;
       },
       clear: function () {
         this.unwatch();
@@ -102,6 +109,7 @@ var validator = {
           field.dirty = false;
         });
         this.dirty = false;
+        return this;
       }
     };
     for (var key in defaultValidation) {
@@ -126,10 +134,10 @@ var validator = {
       vm.$set(field, 'required', false);
       vm.$set(field, 'validating', false);
       vm.$set(field, '_resolvedRules', _this4.resolveRules(field));
-      vm.$set(field, 'errorsVisible', function () {
+      vm.$set(field, 'isValidationErrorsVisible', function () {
         return field.rules && !field.validating && field.dirty && !field.valid;
       });
-      vm.$set(field, 'validationClass', function () {
+      vm.$set(field, 'getValidationClass', function () {
         if (field.rules && field.dirty) {
           if (field.validating) {
             return _this4.validatingClass;
