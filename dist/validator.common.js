@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.3
+ * vue-data-validator v2.0.4
  * phphe
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -9,107 +9,7 @@
 
 var helperJs = require('helper-js');
 
-var asyncToGenerator = function (fn) {
-  return function () {
-    var gen = fn.apply(this, arguments);
-    return new Promise(function (resolve, reject) {
-      function step(key, arg) {
-        try {
-          var info = gen[key](arg);
-          var value = info.value;
-        } catch (error) {
-          reject(error);
-          return;
-        }
-
-        if (info.done) {
-          resolve(value);
-        } else {
-          return Promise.resolve(value).then(function (value) {
-            step("next", value);
-          }, function (err) {
-            step("throw", err);
-          });
-        }
-      }
-
-      return step("next");
-    });
-  };
-};
-
-
-
-
-
-
-
-
-
-
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var validator = {
   rules: {},
@@ -118,13 +18,13 @@ var validator = {
   invalidClass: 'has-error',
   validtingClass: '',
   // The following methods are not recommended
-  install: function (Vue) {
+  install: function install(Vue) {
     Vue.validator = Vue.prototype.$validator = this;
     Vue.prototype.$validate = function (validation, fields) {
       return Vue.validator.validate(validation, fields, this);
     };
   },
-  validate: function (validation, fields, vm) {
+  validate: function validate(validation, fields, vm) {
     var _this = this;
 
     // clear old watchers and reset states
@@ -137,7 +37,7 @@ var validator = {
     });
     return validation;
   },
-  initValidation: function (validation, fields, vm) {
+  initValidation: function initValidation(validation, fields, vm) {
     var defaultValidation = {
       fields: fields,
       dirty: false,
@@ -145,15 +45,15 @@ var validator = {
       validating: false,
       _sensitiveFields: [],
       vm: vm,
-      isSubmitAble: function () {
+      isSubmitAble: function isSubmitAble() {
         return this.valid && !this.validating;
       },
-      getValues: function () {
+      getValues: function getValues() {
         return helperJs.objectMap(this.fields, function (item) {
           return item.value;
         });
       },
-      setValues: function (values) {
+      setValues: function setValues(values) {
         for (var key in values) {
           if (this.fields.hasOwnProperty(key)) {
             this.fields[key].value = values[key];
@@ -161,14 +61,14 @@ var validator = {
         }
         return this;
       },
-      setDirty: function (to) {
+      setDirty: function setDirty(to) {
         this.dirty = to;
         Object.values(this.fields).forEach(function (v) {
           v.dirty = to;
         });
         return this;
       },
-      check: function () {
+      check: function check() {
         var _this2 = this;
 
         return new Promise(function (resolve, reject) {
@@ -182,17 +82,17 @@ var validator = {
           }
         });
       },
-      unwatch: function () {
+      unwatch: function unwatch() {
         Object.values(this.fields).forEach(function (field) {
           field.watcher && field.watcher.unwatch && field.watcher.unwatch();
         });
         return this;
       },
-      pause: function () {
+      pause: function pause() {
         this.unwatch();
         return this;
       },
-      'continue': function () {
+      'continue': function _continue() {
         var _this3 = this;
 
         this.unwatch();
@@ -202,7 +102,7 @@ var validator = {
         });
         return this;
       },
-      clear: function () {
+      clear: function clear() {
         this.unwatch();
         this.setDirty(false);
         Object.values(this.fields).forEach(function (field) {
@@ -215,10 +115,10 @@ var validator = {
       vm.$set(validation, key, defaultValidation[key]);
     }
   },
-  initFields: function (validation, vm) {
+  initFields: function initFields(validation, vm) {
     var _this4 = this;
 
-    var _loop = function (key) {
+    var _loop = function _loop(key) {
       var field = validation.fields[key];
       // filed name
       if (!field.name) vm.$set(field, 'name', key);else if (field.name !== key) {
@@ -253,11 +153,11 @@ var validator = {
       if (firstSensitiveRule) validation._sensitiveFields.push(field);
       // watcher
       var watcher = {
-        getValue: function () {
+        getValue: function getValue() {
           return field.value;
         },
 
-        handler: function (val) {
+        handler: function handler(val) {
           _this4.validateField(field, validation);
           field.dirty = true;
           validation.dirty = true;
@@ -277,7 +177,7 @@ var validator = {
       _loop(key);
     }
   },
-  resolveRules: function (field) {
+  resolveRules: function resolveRules(field) {
     var r = {};
     if (field.rules) {
       var rules = field.rules.split('|');
@@ -313,7 +213,7 @@ var validator = {
     }
     return r;
   },
-  validateField: function (field, validation) {
+  validateField: function validateField(field, validation) {
     var _this5 = this;
 
     //
@@ -325,7 +225,7 @@ var validator = {
     //
     var rules = Object.values(field._resolvedRules);
     var queue = function () {
-      var _ref = asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
         var rule;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
@@ -373,7 +273,7 @@ var validator = {
       });
     });
   },
-  validateRule: function (rule, field, validation, validationId) {
+  validateRule: function validateRule(rule, field, validation, validationId) {
     var _this6 = this;
 
     //
@@ -401,7 +301,7 @@ var validator = {
       }
     });
   },
-  addFieldError: function (rule, field, validation) {
+  addFieldError: function addFieldError(rule, field, validation) {
     // compile message
     var nameInMessage = field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed';
     var message = rule.message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
@@ -430,7 +330,7 @@ var validator = {
     field.valid = false;
     validation.valid = false;
   },
-  removeFieldError: function (rule, field, validation) {
+  removeFieldError: function removeFieldError(rule, field, validation) {
     var errors = {};
     for (var k in field.errors) {
       if (k !== rule.name) {
@@ -444,7 +344,7 @@ var validator = {
       return field.valid;
     });
   },
-  removeFieldAllErrors: function (field, validation) {
+  removeFieldAllErrors: function removeFieldAllErrors(field, validation) {
     field.errors = {};
     // set state
     field.valid = true;

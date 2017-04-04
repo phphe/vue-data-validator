@@ -5,8 +5,6 @@
  * Released under the MIT License.
  */
 
-'use strict';
-
 var zh_CN = {
   accepted: '您必须同意:name才能继续。',
   alpha: ':name仅能包含字母。',
@@ -38,4 +36,4 @@ var zh_CN = {
   remoteNotExisted: ':name已存在。'
 };
 
-module.exports = zh_CN;
+export default zh_CN;

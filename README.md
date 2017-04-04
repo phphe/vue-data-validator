@@ -1,4 +1,5 @@
-# This doc is deprecated
+# Note: This doc is for 1, not  current version
+# 注意: 以下文档是针对版本1的, 不适用于当前版本
 # vue-data-validator
 [中文文档](#ChineseDoc)  
 [中文：验证相关流程](#Chinese-validation-process)

@@ -5,8 +5,6 @@
  * Released under the MIT License.
  */
 
-'use strict';
-
 var en = {
   accepted: 'The :name must be accepted.',
   alpha: 'The :name may only contain letters.',
@@ -38,4 +36,4 @@ var en = {
   remoteNotExisted: 'The :name already exists.'
 };
 
-module.exports = en;
+export default en;
