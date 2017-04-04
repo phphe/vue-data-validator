@@ -228,33 +228,73 @@ var validator = {
     var rules = Object.values(field._resolvedRules);
     var queue = function () {
       var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        var rule;
+        var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, rule;
+
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.t0 = regeneratorRuntime.keys(rules);
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context.prev = 3;
+                _iterator = rules[Symbol.iterator]();
 
-              case 1:
-                if ((_context.t1 = _context.t0()).done) {
-                  _context.next = 7;
+              case 5:
+                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                  _context.next = 12;
                   break;
                 }
 
-                rule = _context.t1.value;
-                _context.next = 5;
+                rule = _step.value;
+                _context.next = 9;
                 return _this5.validateRule(rule, field, validation, validationId);
 
-              case 5:
-                _context.next = 1;
+              case 9:
+                _iteratorNormalCompletion = true;
+                _context.next = 5;
                 break;
 
-              case 7:
+              case 12:
+                _context.next = 18;
+                break;
+
+              case 14:
+                _context.prev = 14;
+                _context.t0 = _context['catch'](3);
+                _didIteratorError = true;
+                _iteratorError = _context.t0;
+
+              case 18:
+                _context.prev = 18;
+                _context.prev = 19;
+
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                  _iterator.return();
+                }
+
+              case 21:
+                _context.prev = 21;
+
+                if (!_didIteratorError) {
+                  _context.next = 24;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 24:
+                return _context.finish(21);
+
+              case 25:
+                return _context.finish(18);
+
+              case 26:
               case 'end':
                 return _context.stop();
             }
           }
-        }, _callee, _this5);
+        }, _callee, _this5, [[3, 14, 18, 26], [19,, 21, 25]]);
       }));
 
       return function queue() {
@@ -280,12 +320,12 @@ var validator = {
 
     //
     if (rule.required != null) {
-      field.required = !helperJs.isFunction(rule.required) ? rule.required : rule.required(field.value, rule.params, field, validation.fields, validation, validation.vm.constructor);
+      field.required = !helperJs.isFunction(rule.required) ? rule.required : rule.required(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
     }
     //
     return new Promise(function (resolve, reject) {
       if (field.required || !helperJs.empty(field.value)) {
-        var isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.constructor);
+        var isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
         if (!helperJs.isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid. field:' + field.name + ', rule:' + rule.name));
         isValid.then(function () {
           if (validationId !== field._validationId) reject(new Error('expired'));
