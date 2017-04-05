@@ -1,27 +1,32 @@
 {
   "name": "vue-data-validator",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "A Vue validator base on data instead of html dom.",
+  "keywords": [
+    "Vue",
+    "Vue2",
+    "Validator"
+  ],
   "main": "dist/vue-data-validator.common.js",
   "module": "dist/vue-data-validator.esm.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node build/build.js"
   },
-  "keywords": [
-    "Vue",
-    "Vue2",
-    "Vue2.0",
-    "Validator"
-  ],
-  "author": "phphe",
-  "license": "MIT",
-  "devDependencies": {
-    "rollup-helper": "^1.0.3"
+  "author": "phphe <phphe@outlook.com> (https://github.com/phphe)",
+  "unpkg": "dist/vue-data-validator.js",
+  "bugs": {
+    "url": "https://github.com/phphe/vue-data-validator/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/phphe/vue-data-validator.git"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "rollup-helper": "^1.0.3"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "helper-js": "^1.0.3"
+  }
 }
