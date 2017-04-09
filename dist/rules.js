@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.6
+ * vue-data-validator v2.0.7
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -156,11 +156,13 @@ var rules = {
     return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
     );
   },
+
   different: {
     handler: function handler(val, params, field, fields) {
       var relatedField = fields[params[0]];
       return val !== relatedField.value;
     },
+
     sensitive: true
   },
   email: function email(val) {
@@ -201,16 +203,23 @@ var rules = {
   numeric: function numeric(val) {
     return isNumeric(val);
   },
+  regex: function regex(val, params) {
+    var reg = isString(params[0]) ? new RegExp(params[0]) : params[0];
+    return reg.test(val);
+  },
+
   required: {
     handler: function handler(val, params, field) {
       return !empty(val);
     },
+
     required: true
   },
   requiredWith: {
     handler: function handler(val) {
       return !empty(val);
     },
+
     sensitive: true,
     required: function required(val, params, field, fields) {
       return !empty(fields[params[0]].value);
@@ -221,6 +230,7 @@ var rules = {
       var relatedField = fields[params[0]];
       return val === relatedField.value;
     },
+
     sensitive: true
   },
   size: function size(val, params) {
@@ -229,30 +239,23 @@ var rules = {
   string: function string(val) {
     return isString(val);
   },
+
   // asynchronous rules
   // Vue.http must be available
   remoteCheck: function remoteCheck(val, params, field, fields, validation, Vue) {
-    if (typeof params[1] !== 'undefined') {
-      var expected = isArray(params[1]) ? params[1] : [params[1]];
-      if (expected.indexOf(val) > -1) {
-        return true;
-      }
+    var expected = isArray(params[1]) ? params[1] : [params[1]];
+    if (expected.includes(val)) {
+      return true;
     }
-    return new Promise(function (resolve, reject) {
-      var url = params[0].replace(/:value/g, val);
-      return Vue.http.get(url).then(function (resp) {
-        if (resp.data === true || resp.data === 1 || resp.data === 'true') {
-          resolve(resp.data, resp.status, resp);
-        } else {
-          reject(resp.data, resp.status, resp);
-        }
-      }).catch(function (resp) {
-        reject(resp.data, resp.status, resp);
-      });
+    var url = params[0];
+    return Vue.http.post(url, { value: val }).then(function (_ref) {
+      var data = _ref.data;
+
+      return data ? Promise.resolve() : Promise.reject(new Error('invalid'));
     });
   },
   remoteNotExisted: function remoteNotExisted(val, params, field, fields, validation, Vue) {
-    return this.remoteCheck(val, params, field, fields, validation, Vue);
+    return rules.remoteCheck(val, params, field, fields, validation, Vue);
   }
 };
 

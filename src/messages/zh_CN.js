@@ -19,6 +19,7 @@ export default {
   minLength: ':name的长度不能低于:params[0]。',
   notIn: '选择的:name不可用。',
   numeric: ':name不是一个正确的数字。',
+  regex: ':name格式错误。',
   required: '请填写:name。',
   requiredWith: '请填写:name。当:params[1]不为空时，:name必填。',
   same: ':name必须与:params[1]相同。',

@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.6
+ * vue-data-validator v2.0.7
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -10,8 +10,6 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var helperJs = require('helper-js');
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var validator = {
   rules: {},
@@ -226,93 +224,53 @@ var validator = {
     this.removeFieldAllErrors(field, validation);
     //
     var rules = Object.values(field._resolvedRules);
-    var queue = function () {
-      var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, rule;
+    var queue = Promise.resolve(true);
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
-                _context.prev = 3;
-                _iterator = rules[Symbol.iterator]();
+    var _loop2 = function _loop2(rule) {
+      queue = queue.then(function () {
+        return _this5.validateRule(rule, field, validation, validationId);
+      });
+    };
 
-              case 5:
-                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context.next = 12;
-                  break;
-                }
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-                rule = _step.value;
-                _context.next = 9;
-                return _this5.validateRule(rule, field, validation, validationId);
+    try {
+      for (var _iterator = rules[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var rule = _step.value;
 
-              case 9:
-                _iteratorNormalCompletion = true;
-                _context.next = 5;
-                break;
+        _loop2(rule);
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
 
-              case 12:
-                _context.next = 18;
-                break;
-
-              case 14:
-                _context.prev = 14;
-                _context.t0 = _context['catch'](3);
-                _didIteratorError = true;
-                _iteratorError = _context.t0;
-
-              case 18:
-                _context.prev = 18;
-                _context.prev = 19;
-
-                if (!_iteratorNormalCompletion && _iterator.return) {
-                  _iterator.return();
-                }
-
-              case 21:
-                _context.prev = 21;
-
-                if (!_didIteratorError) {
-                  _context.next = 24;
-                  break;
-                }
-
-                throw _iteratorError;
-
-              case 24:
-                return _context.finish(21);
-
-              case 25:
-                return _context.finish(18);
-
-              case 26:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, _this5, [[3, 14, 18, 26], [19,, 21, 25]]);
-      }));
-
-      return function queue() {
-        return _ref.apply(this, arguments);
-      };
-    }();
-    queue().then(function () {
+    queue.then(function () {
       return true;
     }).catch(function (error) {
-      return error.message === 'invalid';
-    }).then(function () {
-      // set state: validating of field
-      field._validationId = null;
-      field.validating = false;
-      // set state: validating of validation
-      validation.validating = Object.values(validation.fields).some(function (field) {
-        return field.validating;
-      });
+      return error.message !== 'expired';
+    }).then(function (completed) {
+      if (completed) {
+        // set state: validating of field
+        field._validationId = null;
+        field.validating = false;
+        // set state: validating of validation
+        validation.validating = Object.values(validation.fields).some(function (field) {
+          return field.validating;
+        });
+      }
     });
   },
   validateRule: function validateRule(rule, field, validation, validationId) {
@@ -326,17 +284,17 @@ var validator = {
     return new Promise(function (resolve, reject) {
       if (field.required || !helperJs.empty(field.value)) {
         var isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
-        if (!helperJs.isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid. field:' + field.name + ', rule:' + rule.name));
+        if (!helperJs.isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'));
         isValid.then(function () {
           if (validationId !== field._validationId) reject(new Error('expired'));
           //
           _this6.removeFieldError(rule, field, validation);
           resolve();
-        }).catch(function () {
+        }).catch(function (error) {
           if (validationId !== field._validationId) reject(new Error('expired'));
           //
           _this6.addFieldError(rule, field, validation);
-          reject(new Error('invalid'));
+          reject(error);
         });
       } else {
         resolve();
@@ -426,11 +384,13 @@ var rules = {
     return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
     );
   },
+
   different: {
     handler: function handler(val, params, field, fields) {
       var relatedField = fields[params[0]];
       return val !== relatedField.value;
     },
+
     sensitive: true
   },
   email: function email(val) {
@@ -471,16 +431,23 @@ var rules = {
   numeric: function numeric(val) {
     return helperJs.isNumeric(val);
   },
+  regex: function regex(val, params) {
+    var reg = helperJs.isString(params[0]) ? new RegExp(params[0]) : params[0];
+    return reg.test(val);
+  },
+
   required: {
     handler: function handler(val, params, field) {
       return !helperJs.empty(val);
     },
+
     required: true
   },
   requiredWith: {
     handler: function handler(val) {
       return !helperJs.empty(val);
     },
+
     sensitive: true,
     required: function required(val, params, field, fields) {
       return !helperJs.empty(fields[params[0]].value);
@@ -491,6 +458,7 @@ var rules = {
       var relatedField = fields[params[0]];
       return val === relatedField.value;
     },
+
     sensitive: true
   },
   size: function size(val, params) {
@@ -499,30 +467,23 @@ var rules = {
   string: function string(val) {
     return helperJs.isString(val);
   },
+
   // asynchronous rules
   // Vue.http must be available
   remoteCheck: function remoteCheck(val, params, field, fields, validation, Vue) {
-    if (typeof params[1] !== 'undefined') {
-      var expected = helperJs.isArray(params[1]) ? params[1] : [params[1]];
-      if (expected.indexOf(val) > -1) {
-        return true;
-      }
+    var expected = helperJs.isArray(params[1]) ? params[1] : [params[1]];
+    if (expected.includes(val)) {
+      return true;
     }
-    return new Promise(function (resolve, reject) {
-      var url = params[0].replace(/:value/g, val);
-      return Vue.http.get(url).then(function (resp) {
-        if (resp.data === true || resp.data === 1 || resp.data === 'true') {
-          resolve(resp.data, resp.status, resp);
-        } else {
-          reject(resp.data, resp.status, resp);
-        }
-      }).catch(function (resp) {
-        reject(resp.data, resp.status, resp);
-      });
+    var url = params[0];
+    return Vue.http.post(url, { value: val }).then(function (_ref) {
+      var data = _ref.data;
+
+      return data ? Promise.resolve() : Promise.reject(new Error('invalid'));
     });
   },
   remoteNotExisted: function remoteNotExisted(val, params, field, fields, validation, Vue) {
-    return this.remoteCheck(val, params, field, fields, validation, Vue);
+    return rules.remoteCheck(val, params, field, fields, validation, Vue);
   }
 };
 
@@ -547,6 +508,7 @@ var en = {
   minLength: 'The :name must be at least :params[0] characters.',
   notIn: 'The selected :name is invalid.',
   numeric: 'The :name must be a number.',
+  regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
   requiredWith: 'The :name field is required when :params[1] is present.',
   same: 'The :name and :params[1] must match.',
@@ -578,6 +540,7 @@ var zh_CN = {
   minLength: ':name的长度不能低于:params[0]。',
   notIn: '选择的:name不可用。',
   numeric: ':name不是一个正确的数字。',
+  regex: ':name格式错误。',
   required: '请填写:name。',
   requiredWith: '请填写:name。当:params[1]不为空时，:name必填。',
   same: ':name必须与:params[1]相同。',

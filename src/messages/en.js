@@ -19,6 +19,7 @@ export default {
   minLength: 'The :name must be at least :params[0] characters.',
   notIn: 'The selected :name is invalid.',
   numeric: 'The :name must be a number.',
+  regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
   requiredWith: 'The :name field is required when :params[1] is present.',
   same: 'The :name and :params[1] must match.',

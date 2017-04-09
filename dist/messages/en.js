@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.6
+ * vue-data-validator v2.0.7
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -32,6 +32,7 @@ var en = {
   minLength: 'The :name must be at least :params[0] characters.',
   notIn: 'The selected :name is invalid.',
   numeric: 'The :name must be a number.',
+  regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
   requiredWith: 'The :name field is required when :params[1] is present.',
   same: 'The :name and :params[1] must match.',

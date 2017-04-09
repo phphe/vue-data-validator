@@ -182,17 +182,21 @@ export default {
     this.removeFieldAllErrors(field, validation)
     //
     const rules = Object.values(field._resolvedRules)
-    const queue = async () => {
-      for (const rule of rules) {
-        await this.validateRule(rule, field, validation, validationId)
-      }
+    let queue = Promise.resolve(true)
+    for (const rule of rules) {
+      queue = queue.then(() => this.validateRule(rule, field, validation, validationId))
     }
-    queue().then(() => true).catch((error) => error.message === 'invalid').then(() => {
-      // set state: validating of field
-      field._validationId = null
-      field.validating = false
-      // set state: validating of validation
-      validation.validating = Object.values(validation.fields).some(field => field.validating)
+    queue
+    .then(() => true)
+    .catch((error) => error.message !== 'expired')
+    .then((completed) => {
+      if (completed) {
+        // set state: validating of field
+        field._validationId = null
+        field.validating = false
+        // set state: validating of validation
+        validation.validating = Object.values(validation.fields).some(field => field.validating)
+      }
     })
   },
   validateRule(rule, field, validation, validationId) {
@@ -204,17 +208,17 @@ export default {
     return new Promise((resolve, reject) => {
       if (field.required || !empty(field.value)) {
         let isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor)
-        if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error(`invalid. field:${field.name}, rule:${rule.name}`))
+        if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'))
         isValid.then(() => {
           if (validationId !== field._validationId) reject(new Error('expired'))
           //
           this.removeFieldError(rule, field, validation)
           resolve()
-        }).catch(() => {
+        }).catch((error) => {
           if (validationId !== field._validationId) reject(new Error('expired'))
           //
           this.addFieldError(rule, field, validation)
-          reject(new Error('invalid'))
+          reject(error)
         })
       } else {
         resolve()
