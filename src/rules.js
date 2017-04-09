@@ -22,7 +22,7 @@ const rules = {
     return /^\d\d\d\d-\d\d?-\d\d?$/.test(val)
   },
   datetime(val) {
-    return /^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?(:\d\d?)?$/.test(val)
+    return /^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
   },
   different: {
     handler(val, params, field, fields) {

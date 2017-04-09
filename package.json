@@ -1,6 +1,6 @@
 {
   "name": "vue-data-validator",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "A Vue validator base on data instead of html dom.",
   "keywords": [
     "Vue",

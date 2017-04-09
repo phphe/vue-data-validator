@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.7
+ * vue-data-validator v2.0.8
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -36,7 +36,7 @@ var rules = {
     );
   },
   datetime: function datetime(val) {
-    return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?(:\d\d?)?$/.test(val)
+    return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
     );
   },
 
