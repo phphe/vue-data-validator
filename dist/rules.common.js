@@ -36,7 +36,7 @@ var rules = {
     );
   },
   datetime: function datetime(val) {
-    return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
+    return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?(:\d\d?)?$/.test(val)
     );
   },
 
