@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.8
+ * vue-data-validator v2.0.9
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -228,6 +228,9 @@ var validator = {
           field.required = false;
         });
         return this;
+      },
+      revalidate: function revalidate() {
+        return vm.$validate(this, this.fields);
       }
     };
     for (var key in defaultValidation) {

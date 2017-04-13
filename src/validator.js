@@ -79,6 +79,9 @@ export default {
           field.required = false
         })
         return this
+      },
+      revalidate() {
+        return vm.$validate(this, this.fields)
       }
     }
     for (const key in defaultValidation) {
