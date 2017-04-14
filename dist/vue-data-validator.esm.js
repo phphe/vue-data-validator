@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.9
+ * vue-data-validator v2.1.0
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -39,6 +39,7 @@ var validator = {
       dirty: false,
       valid: false,
       validating: false,
+      isPause: false,
       _sensitiveFields: [],
       vm: vm,
       isSubmitAble: function isSubmitAble() {
@@ -69,10 +70,10 @@ var validator = {
 
         return new Promise(function (resolve, reject) {
           if (_this2.validating) {
-            reject(new Error('Data is being validated'));
+            reject(new Error('validating'));
           } else if (!_this2.valid) {
             _this2.setDirty(true);
-            reject(new Error('Data is invalid'));
+            reject(new Error('invalid'));
           } else {
             resolve(_this2.getValues());
           }
@@ -85,17 +86,11 @@ var validator = {
         return this;
       },
       pause: function pause() {
-        this.unwatch();
+        this.isPause = true;
         return this;
       },
       'continue': function _continue() {
-        var _this3 = this;
-
-        this.unwatch();
-        Object.values(this.fields).forEach(function (field) {
-          var watcher = field.watcher;
-          watcher.unwatch = _this3.vm.$watch(watcher.getValue, watcher.handler);
-        });
+        this.isPause = false;
         return this;
       },
       clear: function clear() {
@@ -108,6 +103,21 @@ var validator = {
       },
       revalidate: function revalidate() {
         return vm.$validate(this, this.fields);
+      },
+      getFirstError: function getFirstError() {
+        var field = Object.values(this.fields).find(function (field) {
+          return Object.values(field.errors)[0];
+        });
+        return field && Object.values(field.errors)[0];
+      },
+      getErrors: function getErrors() {
+        var errors = [];
+        Object.values(this.fields).forEach(function (field) {
+          Object.values(field.errors).forEach(function (error) {
+            errors.push(error);
+          });
+        });
+        return errors;
       }
     };
     for (var key in defaultValidation) {
@@ -115,7 +125,7 @@ var validator = {
     }
   },
   initFields: function initFields(validation, vm) {
-    var _this4 = this;
+    var _this3 = this;
 
     var _loop = function _loop(key) {
       var field = validation.fields[key];
@@ -131,16 +141,16 @@ var validator = {
       vm.$set(field, 'errors', {});
       vm.$set(field, 'required', false);
       vm.$set(field, 'validating', false);
-      vm.$set(field, '_resolvedRules', _this4.resolveRules(field));
+      vm.$set(field, '_resolvedRules', _this3.resolveRules(field));
       vm.$set(field, 'isValidationErrorsVisible', function () {
         return field.rules && !field.validating && field.dirty && !field.valid;
       });
       vm.$set(field, 'getValidationClass', function () {
         if (field.rules && field.dirty) {
           if (field.validating) {
-            return _this4.validatingClass;
+            return _this3.validatingClass;
           } else {
-            return field.valid ? _this4.validClass : _this4.invalidClass;
+            return field.valid ? _this3.validClass : _this3.invalidClass;
           }
         }
         return null;
@@ -157,14 +167,15 @@ var validator = {
         },
 
         handler: function handler(val) {
-          _this4.validateField(field, validation);
+          if (validation.isPause) return;
+          _this3.validateField(field, validation);
           field.dirty = true;
           validation.dirty = true;
           // validate other sensitive field
           validation._sensitiveFields.filter(function (item) {
             return item !== field;
           }).forEach(function (item) {
-            _this4.validateField(item, validation);
+            _this3.validateField(item, validation);
           });
         }
       };
@@ -213,7 +224,7 @@ var validator = {
     return r;
   },
   validateField: function validateField(field, validation) {
-    var _this5 = this;
+    var _this4 = this;
 
     //
     var validationId = {};
@@ -227,7 +238,7 @@ var validator = {
 
     var _loop2 = function _loop2(rule) {
       queue = queue.then(function () {
-        return _this5.validateRule(rule, field, validation, validationId);
+        return _this4.validateRule(rule, field, validation, validationId);
       });
     };
 
@@ -273,26 +284,40 @@ var validator = {
     });
   },
   validateRule: function validateRule(rule, field, validation, validationId) {
-    var _this6 = this;
+    var _this5 = this;
 
     //
     if (rule.required != null) {
-      field.required = !isFunction(rule.required) ? rule.required : rule.required(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
+      field.required = !isFunction(rule.required) ? rule.required : rule.required({
+        value: field.value,
+        params: rule.params,
+        field: field,
+        fields: validation.fields,
+        validation: validation,
+        Vue: validation.vm.$root.constructor
+      });
     }
     //
     return new Promise(function (resolve, reject) {
       if (field.required || !empty(field.value)) {
-        var isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
+        var isValid = rule.handler({
+          value: field.value,
+          params: rule.params,
+          field: field,
+          fields: validation.fields,
+          validation: validation,
+          Vue: validation.vm.$root.constructor
+        });
         if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'));
         isValid.then(function () {
           if (validationId !== field._validationId) reject(new Error('expired'));
           //
-          _this6.removeFieldError(rule, field, validation);
+          _this5.removeFieldError(rule, field, validation);
           resolve();
         }).catch(function (error) {
           if (validationId !== field._validationId) reject(new Error('expired'));
           //
-          _this6.addFieldError(rule, field, validation);
+          _this5.addFieldError(rule, field, validation);
           reject(error);
         });
       } else {
@@ -309,6 +334,7 @@ var validator = {
       message = message.replace(reg, rule.params[i]);
     }
     // if error of this rule hasnt set yet, set it
+    // copy errors in order
     if (!field.errors[rule.name]) {
       var errors = {};
       for (var k in field._resolvedRules) {
@@ -323,7 +349,8 @@ var validator = {
     // set error
     field.errors[rule.name] = {
       name: rule.name,
-      message: message
+      message: message,
+      field: field
     };
     // set state
     field.valid = false;
@@ -354,135 +381,218 @@ var validator = {
 };
 
 var rules = {
-  accepted: function accepted(val) {
-    return val === 'yes' || val === 'on' || val === true || val === 1 || val === '1';
+  accepted: function accepted(_ref) {
+    var value = _ref.value;
+
+    return value === 'yes' || value === 'on' || value === true || value === 1 || value === '1';
   },
-  alpha: function alpha(val) {
-    return (/^[a-zA-Z]+$/.test(val)
+  alpha: function alpha(_ref2) {
+    var value = _ref2.value;
+
+    return (/^[a-zA-Z]+$/.test(value)
     );
   },
-  alphaDash: function alphaDash(val) {
-    return (/^[\w-]+$/.test(val)
+  alphaDash: function alphaDash(_ref3) {
+    var value = _ref3.value;
+
+    return (/^[\w-]+$/.test(value)
     );
   },
-  alphaNum: function alphaNum(val) {
-    return (/^[\w]+$/.test(val)
+  alphaNum: function alphaNum(_ref4) {
+    var value = _ref4.value;
+
+    return (/^[\w]+$/.test(value)
     );
   },
-  between: function between(val, params) {
-    return params[0] <= val && params[1] <= val;
+  between: function between(_ref5) {
+    var value = _ref5.value,
+        params = _ref5.params;
+
+    return params[0] <= value && params[1] <= value;
   },
-  boolean: function boolean(val) {
-    return [true, false, 1, 0, '1', '0'].includes(val);
+  boolean: function boolean(_ref6) {
+    var value = _ref6.value;
+
+    return [true, false, 1, 0, '1', '0'].includes(value);
   },
-  date: function date(val) {
-    return (/^\d\d\d\d-\d\d?-\d\d?$/.test(val)
+  date: function date(_ref7) {
+    var value = _ref7.value;
+
+    return (/^\d\d\d\d-\d\d?-\d\d?$/.test(value)
     );
   },
-  datetime: function datetime(val) {
-    return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
+  datetime: function datetime(_ref8) {
+    var value = _ref8.value;
+
+    return (/^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(value)
     );
   },
 
   different: {
-    handler: function handler(val, params, field, fields) {
+    handler: function handler(_ref9) {
+      var value = _ref9.value,
+          params = _ref9.params,
+          field = _ref9.field,
+          fields = _ref9.fields;
+
       var relatedField = fields[params[0]];
-      return val !== relatedField.value;
+      return value !== relatedField.value;
     },
 
     sensitive: true
   },
-  email: function email(val) {
-    return (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val)
+  email: function email(_ref10) {
+    var value = _ref10.value;
+
+    return (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
     );
   },
-  in: function _in(val, params) {
+  in: function _in(_ref11) {
+    var value = _ref11.value,
+        params = _ref11.params;
+
     var list = isArray(params[0]) ? params[0] : params;
-    return list.indexOf(val) > -1;
+    return list.indexOf(value) > -1;
   },
-  integer: function integer(val) {
-    return (/^-?[1-9]\d*$/.test(val)
+  integer: function integer(_ref12) {
+    var value = _ref12.value;
+
+    return (/^-?[1-9]\d*$/.test(value)
     );
   },
-  length: function length(val, params) {
-    return (val || '').toString().length === parseInt(params[0]);
+  length: function length(_ref13) {
+    var value = _ref13.value,
+        params = _ref13.params;
+
+    return (value || '').toString().length === parseInt(params[0]);
   },
-  lengthBetween: function lengthBetween(val, params) {
-    var len = (val || '').toString().length;
+  lengthBetween: function lengthBetween(_ref14) {
+    var value = _ref14.value,
+        params = _ref14.params;
+
+    var len = (value || '').toString().length;
     return params[0] <= len && len <= params[1];
   },
-  max: function max(val, params) {
-    return val <= params[0];
+  max: function max(_ref15) {
+    var value = _ref15.value,
+        params = _ref15.params;
+
+    return value <= params[0];
   },
-  maxLength: function maxLength(val, params) {
-    return (val || '').toString().length <= params[0];
+  maxLength: function maxLength(_ref16) {
+    var value = _ref16.value,
+        params = _ref16.params;
+
+    return (value || '').toString().length <= params[0];
   },
-  min: function min(val, params) {
-    return val >= params[0];
+  min: function min(_ref17) {
+    var value = _ref17.value,
+        params = _ref17.params;
+
+    return value >= params[0];
   },
-  minLength: function minLength(val, params) {
-    return (val || '').toString().length >= params[0];
+  minLength: function minLength(_ref18) {
+    var value = _ref18.value,
+        params = _ref18.params;
+
+    return (value || '').toString().length >= params[0];
   },
-  notIn: function notIn(val, params) {
+  notIn: function notIn(_ref19) {
+    var value = _ref19.value,
+        params = _ref19.params;
+
     var list = isArray(params[0]) ? params[0] : params;
-    return list.indexOf(val) === -1;
+    return list.indexOf(value) === -1;
   },
-  numeric: function numeric(val) {
-    return isNumeric(val);
+  numeric: function numeric(_ref20) {
+    var value = _ref20.value;
+
+    return isNumeric(value);
   },
-  regex: function regex(val, params) {
+  regex: function regex(_ref21) {
+    var value = _ref21.value,
+        params = _ref21.params;
+
     var reg = isString(params[0]) ? new RegExp(params[0]) : params[0];
-    return reg.test(val);
+    return reg.test(value);
   },
 
   required: {
-    handler: function handler(val, params, field) {
-      return !empty(val);
+    handler: function handler(_ref22) {
+      var value = _ref22.value,
+          params = _ref22.params,
+          field = _ref22.field;
+
+      return !empty(value);
     },
 
     required: true
   },
   requiredWith: {
-    handler: function handler(val) {
-      return !empty(val);
+    handler: function handler(_ref23) {
+      var value = _ref23.value;
+
+      return !empty(value);
     },
 
     sensitive: true,
-    required: function required(val, params, field, fields) {
+    required: function required(_ref24) {
+      var value = _ref24.value,
+          params = _ref24.params,
+          field = _ref24.field,
+          fields = _ref24.fields;
+
       return !empty(fields[params[0]].value);
     }
   },
   same: {
-    handler: function handler(val, params, field, fields) {
+    handler: function handler(_ref25) {
+      var value = _ref25.value,
+          params = _ref25.params,
+          field = _ref25.field,
+          fields = _ref25.fields;
+
       var relatedField = fields[params[0]];
-      return val === relatedField.value;
+      return value === relatedField.value;
     },
 
     sensitive: true
   },
-  size: function size(val, params) {
-    return (val || '').toString().length === parseInt(params[0]);
+  size: function size(_ref26) {
+    var value = _ref26.value,
+        params = _ref26.params;
+
+    return (value || '').toString().length === parseInt(params[0]);
   },
-  string: function string(val) {
-    return isString(val);
+  string: function string(_ref27) {
+    var value = _ref27.value;
+
+    return isString(value);
   },
 
   // asynchronous rules
   // Vue.http must be available
-  remoteCheck: function remoteCheck(val, params, field, fields, validation, Vue) {
+  remoteCheck: function remoteCheck(_ref28) {
+    var value = _ref28.value,
+        params = _ref28.params,
+        field = _ref28.field,
+        fields = _ref28.fields,
+        validation = _ref28.validation,
+        Vue = _ref28.Vue;
+
     var expected = isArray(params[1]) ? params[1] : [params[1]];
-    if (expected.includes(val)) {
+    if (expected.includes(value)) {
       return true;
     }
     var url = params[0];
-    return Vue.http.post(url, { value: val }).then(function (_ref) {
-      var data = _ref.data;
+    return Vue.http.post(url, { value: value }).then(function (_ref29) {
+      var data = _ref29.data;
 
       return data ? Promise.resolve() : Promise.reject(new Error('invalid'));
     });
   },
-  remoteNotExisted: function remoteNotExisted(val, params, field, fields, validation, Vue) {
-    return rules.remoteCheck(val, params, field, fields, validation, Vue);
+  remoteNotExisted: function remoteNotExisted(obj) {
+    return rules.remoteCheck(obj);
   }
 };
 

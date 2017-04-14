@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.0.9
+ * vue-data-validator v2.1.0
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -41,6 +41,7 @@ var validator = {
       dirty: false,
       valid: false,
       validating: false,
+      isPause: false,
       _sensitiveFields: [],
       vm: vm,
       isSubmitAble: function isSubmitAble() {
@@ -71,10 +72,10 @@ var validator = {
 
         return new Promise(function (resolve, reject) {
           if (_this2.validating) {
-            reject(new Error('Data is being validated'));
+            reject(new Error('validating'));
           } else if (!_this2.valid) {
             _this2.setDirty(true);
-            reject(new Error('Data is invalid'));
+            reject(new Error('invalid'));
           } else {
             resolve(_this2.getValues());
           }
@@ -87,17 +88,11 @@ var validator = {
         return this;
       },
       pause: function pause() {
-        this.unwatch();
+        this.isPause = true;
         return this;
       },
       'continue': function _continue() {
-        var _this3 = this;
-
-        this.unwatch();
-        Object.values(this.fields).forEach(function (field) {
-          var watcher = field.watcher;
-          watcher.unwatch = _this3.vm.$watch(watcher.getValue, watcher.handler);
-        });
+        this.isPause = false;
         return this;
       },
       clear: function clear() {
@@ -110,6 +105,21 @@ var validator = {
       },
       revalidate: function revalidate() {
         return vm.$validate(this, this.fields);
+      },
+      getFirstError: function getFirstError() {
+        var field = Object.values(this.fields).find(function (field) {
+          return Object.values(field.errors)[0];
+        });
+        return field && Object.values(field.errors)[0];
+      },
+      getErrors: function getErrors() {
+        var errors = [];
+        Object.values(this.fields).forEach(function (field) {
+          Object.values(field.errors).forEach(function (error) {
+            errors.push(error);
+          });
+        });
+        return errors;
       }
     };
     for (var key in defaultValidation) {
@@ -117,7 +127,7 @@ var validator = {
     }
   },
   initFields: function initFields(validation, vm) {
-    var _this4 = this;
+    var _this3 = this;
 
     var _loop = function _loop(key) {
       var field = validation.fields[key];
@@ -133,16 +143,16 @@ var validator = {
       vm.$set(field, 'errors', {});
       vm.$set(field, 'required', false);
       vm.$set(field, 'validating', false);
-      vm.$set(field, '_resolvedRules', _this4.resolveRules(field));
+      vm.$set(field, '_resolvedRules', _this3.resolveRules(field));
       vm.$set(field, 'isValidationErrorsVisible', function () {
         return field.rules && !field.validating && field.dirty && !field.valid;
       });
       vm.$set(field, 'getValidationClass', function () {
         if (field.rules && field.dirty) {
           if (field.validating) {
-            return _this4.validatingClass;
+            return _this3.validatingClass;
           } else {
-            return field.valid ? _this4.validClass : _this4.invalidClass;
+            return field.valid ? _this3.validClass : _this3.invalidClass;
           }
         }
         return null;
@@ -159,14 +169,15 @@ var validator = {
         },
 
         handler: function handler(val) {
-          _this4.validateField(field, validation);
+          if (validation.isPause) return;
+          _this3.validateField(field, validation);
           field.dirty = true;
           validation.dirty = true;
           // validate other sensitive field
           validation._sensitiveFields.filter(function (item) {
             return item !== field;
           }).forEach(function (item) {
-            _this4.validateField(item, validation);
+            _this3.validateField(item, validation);
           });
         }
       };
@@ -215,7 +226,7 @@ var validator = {
     return r;
   },
   validateField: function validateField(field, validation) {
-    var _this5 = this;
+    var _this4 = this;
 
     //
     var validationId = {};
@@ -229,7 +240,7 @@ var validator = {
 
     var _loop2 = function _loop2(rule) {
       queue = queue.then(function () {
-        return _this5.validateRule(rule, field, validation, validationId);
+        return _this4.validateRule(rule, field, validation, validationId);
       });
     };
 
@@ -275,26 +286,40 @@ var validator = {
     });
   },
   validateRule: function validateRule(rule, field, validation, validationId) {
-    var _this6 = this;
+    var _this5 = this;
 
     //
     if (rule.required != null) {
-      field.required = !helperJs.isFunction(rule.required) ? rule.required : rule.required(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
+      field.required = !helperJs.isFunction(rule.required) ? rule.required : rule.required({
+        value: field.value,
+        params: rule.params,
+        field: field,
+        fields: validation.fields,
+        validation: validation,
+        Vue: validation.vm.$root.constructor
+      });
     }
     //
     return new Promise(function (resolve, reject) {
       if (field.required || !helperJs.empty(field.value)) {
-        var isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor);
+        var isValid = rule.handler({
+          value: field.value,
+          params: rule.params,
+          field: field,
+          fields: validation.fields,
+          validation: validation,
+          Vue: validation.vm.$root.constructor
+        });
         if (!helperJs.isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'));
         isValid.then(function () {
           if (validationId !== field._validationId) reject(new Error('expired'));
           //
-          _this6.removeFieldError(rule, field, validation);
+          _this5.removeFieldError(rule, field, validation);
           resolve();
         }).catch(function (error) {
           if (validationId !== field._validationId) reject(new Error('expired'));
           //
-          _this6.addFieldError(rule, field, validation);
+          _this5.addFieldError(rule, field, validation);
           reject(error);
         });
       } else {
@@ -311,6 +336,7 @@ var validator = {
       message = message.replace(reg, rule.params[i]);
     }
     // if error of this rule hasnt set yet, set it
+    // copy errors in order
     if (!field.errors[rule.name]) {
       var errors = {};
       for (var k in field._resolvedRules) {
@@ -325,7 +351,8 @@ var validator = {
     // set error
     field.errors[rule.name] = {
       name: rule.name,
-      message: message
+      message: message,
+      field: field
     };
     // set state
     field.valid = false;

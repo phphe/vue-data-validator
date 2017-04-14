@@ -25,6 +25,7 @@ export default {
       dirty: false,
       valid: false,
       validating: false,
+      isPause: false,
       _sensitiveFields: [],
       vm,
       isSubmitAble() { return this.valid && !this.validating },
@@ -45,10 +46,10 @@ export default {
       check() {
         return new Promise((resolve, reject) => {
           if (this.validating) {
-            reject(new Error('Data is being validated'))
+            reject(new Error('validating'))
           } else if (!this.valid) {
             this.setDirty(true)
-            reject(new Error('Data is invalid'))
+            reject(new Error('invalid'))
           } else {
             resolve(this.getValues())
           }
@@ -61,15 +62,11 @@ export default {
         return this
       },
       pause() {
-        this.unwatch()
+        this.isPause = true
         return this
       },
       'continue'() {
-        this.unwatch()
-        Object.values(this.fields).forEach((field) => {
-          const watcher = field.watcher
-          watcher.unwatch = this.vm.$watch(watcher.getValue, watcher.handler)
-        })
+        this.isPause = false
         return this
       },
       clear() {
@@ -82,6 +79,19 @@ export default {
       },
       revalidate() {
         return vm.$validate(this, this.fields)
+      },
+      getFirstError() {
+        const field = Object.values(this.fields).find(field => Object.values(field.errors)[0])
+        return field && Object.values(field.errors)[0]
+      },
+      getErrors() {
+        const errors = []
+        Object.values(this.fields).forEach(field => {
+          Object.values(field.errors).forEach(error => {
+            errors.push(error)
+          })
+        })
+        return errors
       }
     }
     for (const key in defaultValidation) {
@@ -125,6 +135,7 @@ export default {
       const watcher = {
         getValue() { return field.value },
         handler: (val) => {
+          if (validation.isPause) return
           this.validateField(field, validation)
           field.dirty = true
           validation.dirty = true
@@ -205,12 +216,26 @@ export default {
   validateRule(rule, field, validation, validationId) {
     //
     if (rule.required != null) {
-      field.required = !isFunction(rule.required) ? rule.required : rule.required(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor)
+      field.required = !isFunction(rule.required) ? rule.required : rule.required({
+        value: field.value,
+        params: rule.params,
+        field,
+        fields: validation.fields,
+        validation,
+        Vue: validation.vm.$root.constructor
+      })
     }
     //
     return new Promise((resolve, reject) => {
       if (field.required || !empty(field.value)) {
-        let isValid = rule.handler(field.value, rule.params, field, validation.fields, validation, validation.vm.$root.constructor)
+        let isValid = rule.handler({
+          value: field.value,
+          params: rule.params,
+          field,
+          fields: validation.fields,
+          validation,
+          Vue: validation.vm.$root.constructor
+        })
         if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'))
         isValid.then(() => {
           if (validationId !== field._validationId) reject(new Error('expired'))
@@ -237,6 +262,7 @@ export default {
       message = message.replace(reg, rule.params[i])
     }
     // if error of this rule hasnt set yet, set it
+    // copy errors in order
     if (!field.errors[rule.name]) {
       const errors = {}
       for (const k in field._resolvedRules) {
@@ -251,7 +277,8 @@ export default {
     // set error
     field.errors[rule.name] = {
       name: rule.name,
-      message: message
+      message: message,
+      field
     }
     // set state
     field.valid = false

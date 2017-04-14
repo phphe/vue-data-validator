@@ -1,119 +1,119 @@
 import {isArray, isString, isNumeric, empty} from 'helper-js'
 const rules = {
-  accepted(val) {
-    return val === 'yes' || val === 'on' || val === true || val === 1 || val === '1'
+  accepted({value}) {
+    return value === 'yes' || value === 'on' || value === true || value === 1 || value === '1'
   },
-  alpha(val) {
-    return /^[a-zA-Z]+$/.test(val)
+  alpha({value}) {
+    return /^[a-zA-Z]+$/.test(value)
   },
-  alphaDash(val) {
-    return /^[\w-]+$/.test(val)
+  alphaDash({value}) {
+    return /^[\w-]+$/.test(value)
   },
-  alphaNum(val) {
-    return /^[\w]+$/.test(val)
+  alphaNum({value}) {
+    return /^[\w]+$/.test(value)
   },
-  between(val, params) {
-    return params[0] <= val && params[1] <= val
+  between({value, params}) {
+    return params[0] <= value && params[1] <= value
   },
-  boolean(val) {
-    return [true, false, 1, 0, '1', '0'].includes(val)
+  boolean({value}) {
+    return [true, false, 1, 0, '1', '0'].includes(value)
   },
-  date(val) {
-    return /^\d\d\d\d-\d\d?-\d\d?$/.test(val)
+  date({value}) {
+    return /^\d\d\d\d-\d\d?-\d\d?$/.test(value)
   },
-  datetime(val) {
-    return /^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(val)
+  datetime({value}) {
+    return /^\d\d\d\d-\d\d?-\d\d? \d\d?:\d\d?:\d\d?$/.test(value)
   },
   different: {
-    handler(val, params, field, fields) {
+    handler({value, params, field, fields}) {
       const relatedField = fields[params[0]]
-      return val !== relatedField.value
+      return value !== relatedField.value
     },
     sensitive: true
   },
-  email(val) {
-    return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val)
+  email({value}) {
+    return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
   },
-  in(val, params) {
+  in({value, params}) {
     const list = isArray(params[0]) ? params[0] : params
-    return list.indexOf(val) > -1
+    return list.indexOf(value) > -1
   },
-  integer(val) {
-    return /^-?[1-9]\d*$/.test(val)
+  integer({value}) {
+    return /^-?[1-9]\d*$/.test(value)
   },
-  length(val, params) {
-    return (val || '').toString().length === parseInt(params[0])
+  length({value, params}) {
+    return (value || '').toString().length === parseInt(params[0])
   },
-  lengthBetween(val, params) {
-    const len = (val || '').toString().length
+  lengthBetween({value, params}) {
+    const len = (value || '').toString().length
     return (params[0] <= len && len <= params[1])
   },
-  max(val, params) {
-    return val <= params[0]
+  max({value, params}) {
+    return value <= params[0]
   },
-  maxLength(val, params) {
-    return (val || '').toString().length <= params[0]
+  maxLength({value, params}) {
+    return (value || '').toString().length <= params[0]
   },
-  min(val, params) {
-    return val >= params[0]
+  min({value, params}) {
+    return value >= params[0]
   },
-  minLength(val, params) {
-    return (val || '').toString().length >= params[0]
+  minLength({value, params}) {
+    return (value || '').toString().length >= params[0]
   },
-  notIn(val, params) {
+  notIn({value, params}) {
     const list = isArray(params[0]) ? params[0] : params
-    return list.indexOf(val) === -1
+    return list.indexOf(value) === -1
   },
-  numeric(val) {
-    return isNumeric(val)
+  numeric({value}) {
+    return isNumeric(value)
   },
-  regex(val, params) {
+  regex({value, params}) {
     const reg = isString(params[0]) ? new RegExp(params[0]) : params[0]
-    return reg.test(val)
+    return reg.test(value)
   },
   required: {
-    handler(val, params, field) {
-      return !empty(val)
+    handler({value, params, field}) {
+      return !empty(value)
     },
     required: true
   },
   requiredWith: {
-    handler(val) {
-      return !empty(val)
+    handler({value}) {
+      return !empty(value)
     },
     sensitive: true,
-    required(val, params, field, fields) {
+    required({value, params, field, fields}) {
       return !empty(fields[params[0]].value)
     }
   },
   same: {
-    handler(val, params, field, fields) {
+    handler({value, params, field, fields}) {
       const relatedField = fields[params[0]]
-      return val === relatedField.value
+      return value === relatedField.value
     },
     sensitive: true
   },
-  size(val, params) {
-    return (val || '').toString().length === parseInt(params[0])
+  size({value, params}) {
+    return (value || '').toString().length === parseInt(params[0])
   },
-  string(val) {
-    return isString(val)
+  string({value}) {
+    return isString(value)
   },
   // asynchronous rules
   // Vue.http must be available
-  remoteCheck(val, params, field, fields, validation, Vue) {
+  remoteCheck({value, params, field, fields, validation, Vue}) {
     const expected = isArray(params[1]) ? params[1] : [params[1]]
-    if (expected.includes(val)) {
+    if (expected.includes(value)) {
       return true
     }
     const url = params[0]
-    return Vue.http.post(url, { value: val })
+    return Vue.http.post(url, { value: value })
     .then(({data}) => {
       return data ? Promise.resolve() : Promise.reject(new Error('invalid'))
     })
   },
-  remoteNotExisted (val, params, field, fields, validation, Vue) {
-    return rules.remoteCheck(val, params, field, fields, validation, Vue)
+  remoteNotExisted (obj) {
+    return rules.remoteCheck(obj)
   }
 }
 export default rules
