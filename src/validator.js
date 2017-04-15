@@ -136,9 +136,14 @@ export default {
         getValue() { return field.value },
         handler: (val) => {
           if (validation.isPause) return
+          // set dirty
+          if (field._ignoreDirtyOnce) {
+            field._ignoreDirtyOnce = false
+          } else {
+            field.dirty = true
+            validation.dirty = true
+          }
           this.validateField(field, validation)
-          field.dirty = true
-          validation.dirty = true
           // validate other sensitive field
           validation._sensitiveFields
           .filter(item => item !== field)

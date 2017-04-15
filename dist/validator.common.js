@@ -170,9 +170,14 @@ var validator = {
 
         handler: function handler(val) {
           if (validation.isPause) return;
+          // set dirty
+          if (field._ignoreDirtyOnce) {
+            field._ignoreDirtyOnce = false;
+          } else {
+            field.dirty = true;
+            validation.dirty = true;
+          }
           _this3.validateField(field, validation);
-          field.dirty = true;
-          validation.dirty = true;
           // validate other sensitive field
           validation._sensitiveFields.filter(function (item) {
             return item !== field;
