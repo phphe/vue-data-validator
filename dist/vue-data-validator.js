@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.0
+ * vue-data-validator v2.1.1
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -12,9 +12,9 @@
 }(this, (function (exports) { 'use strict';
 
 /*!
- * helper-js v1.0.0
+ * helper-js v1.0.6
  * phphe <phphe@outlook.com> (https://github.com/phphe)
- * undefined
+ * https://github.com/phphe/helper-js.git
  * Released under the MIT License.
  */
 
@@ -71,70 +71,7 @@ function objectMap(obj, func) {
   }
   return r;
 }
-function getOffset(el) {
-  var elOffset = {
-    x: el.offsetLeft,
-    y: el.offsetTop
-  };
-  var parentOffset = { x: 0, y: 0 };
-  if (el.offsetParent != null) parentOffset = getOffset(el.offsetParent);
-  return {
-    x: elOffset.x + parentOffset.x,
-    y: elOffset.y + parentOffset.y
-  };
-}
-// overload waitFor(condition, time = 100, maxCount = 1000))
-function waitFor(name, condition) {
-  var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 100;
-  var maxCount = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1000;
-
-  if (isFunction(name)) {
-    maxCount = time;
-    time = isNumeric(condition) ? condition : 100;
-    condition = name;
-    name = null;
-  }
-  if (!waitFor._waits) {
-    waitFor._waits = {};
-  }
-  var waits = waitFor._waits;
-  if (name && isset(waits[name])) {
-    window.clearInterval(waits[name]);
-    delete waits[name];
-  }
-  return new Promise(function (resolve, reject) {
-    var count = 0;
-    function judge(interval) {
-      if (count <= maxCount) {
-        if (condition()) {
-          stop(interval, name);
-          resolve();
-        }
-      } else {
-        stop(interval, name);
-        reject(new Error('waitFor: Limit is reached'));
-      }
-      count++;
-    }
-    function stop(interval, name) {
-      if (interval) {
-        if (name && isset(waits[name])) {
-          window.clearInterval(waits[name]);
-          delete waits[name];
-        } else {
-          window.clearInterval(interval);
-        }
-      }
-    }
-    var interval = window.setInterval(function () {
-      judge(interval);
-    }, time);
-    if (name) {
-      waits[name] = interval;
-    }
-    judge();
-  });
-}
+var storeOfWaitFor = {};
 
 var validator = {
   rules: {},
