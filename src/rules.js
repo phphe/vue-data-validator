@@ -40,6 +40,7 @@ const rules = {
   },
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
   integer({value}) {
+    value = parseInt(value)
     return typeof value === 'number' &&
     isFinite(value) &&
     Math.floor(value) === value

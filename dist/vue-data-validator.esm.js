@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.2
+ * vue-data-validator v2.1.3
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -463,6 +463,7 @@ var rules = {
   integer: function integer(_ref12) {
     var value = _ref12.value;
 
+    value = parseInt(value);
     return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
   },
   length: function length(_ref13) {
