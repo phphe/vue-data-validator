@@ -38,12 +38,9 @@ const rules = {
     const list = isArray(params[0]) ? params[0] : params
     return list.indexOf(value) > -1
   },
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
   integer({value}) {
-    value = parseInt(value)
-    return typeof value === 'number' &&
-    isFinite(value) &&
-    Math.floor(value) === value
+    const reg = /^\-?\d+$/
+    return reg.test(value)
   },
   length({value, params}) {
     return (value || '').toString().length === parseInt(params[0])
