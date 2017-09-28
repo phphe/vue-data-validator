@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.1
+ * vue-data-validator v2.1.2
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -360,9 +360,8 @@ var validator = {
       name: rule.name,
       message: message,
       field: field
-    };
-    // set state
-    field.valid = false;
+      // set state
+    };field.valid = false;
     validation.valid = false;
   },
   removeFieldError: function removeFieldError(rule, field, validation) {
@@ -463,11 +462,12 @@ var rules = {
     var list = helperJs.isArray(params[0]) ? params[0] : params;
     return list.indexOf(value) > -1;
   },
+
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
   integer: function integer(_ref12) {
     var value = _ref12.value;
 
-    return (/^-?[1-9]\d*$/.test(value)
-    );
+    return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
   },
   length: function length(_ref13) {
     var value = _ref13.value,

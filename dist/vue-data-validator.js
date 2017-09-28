@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.1
+ * vue-data-validator v2.1.2
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -12,12 +12,14 @@
 }(this, (function (exports) { 'use strict';
 
 /*!
- * helper-js v1.0.6
+ * helper-js v1.0.24
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/helper-js.git
  * Released under the MIT License.
  */
 
+// local store
+var store = {};
 // is 各种判断
 function isset(v) {
   return typeof v !== 'undefined';
@@ -32,8 +34,7 @@ function isNumber(v) {
   return Object.prototype.toString.call(v) === '[object Number]';
 }
 function isNumeric(v) {
-  var num = parseFloat(v);
-  return !isNaN(num) && isNumber(num);
+  return isFinite(v);
 }
 function isString(v) {
   return Object.prototype.toString.call(v) === '[object String]';
@@ -60,9 +61,32 @@ function empty(v) {
     return Object.keys(v).length === 0;
   }
 }
+// num
+function numRand(min, max) {
+  if (arguments.length === 1) {
+    max = min;
+    min = 0;
+  }
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function max$1(n, max) {
+  return n < max ? n : max;
+}
+
 // str 字符
 function studlyCase(str) {
   return str && str[0].toUpperCase() + str.substr(1);
+}
+function strRand() {
+  var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
+  var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+  var r = '';
+  var seeds = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (var i = 0; i < len; i++) {
+    r += seeds[numRand(seeds.length - 1)];
+  }
+  return prefix + r;
 }
 function objectMap(obj, func) {
   var r = {};
@@ -71,7 +95,107 @@ function objectMap(obj, func) {
   }
   return r;
 }
-var storeOfWaitFor = {};
+// source: http://stackoverflow.com/questions/8817394/javascript-get-deep-value-from-object-by-passing-path-to-it-as-string
+function objectGet(obj, path) {
+  var paths = path.split('.');
+  var current = obj;
+
+  for (var i = 0; i < paths.length; i++) {
+    if (current[paths[i]] == null) {
+      return null;
+    } else {
+      current = current[paths[i]];
+    }
+  }
+  return current;
+}
+
+/* eslint-enable */
+// dom
+function uniqueId() {
+  var prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'id_';
+
+  var id = prefix + strRand();
+  if (!store.uniqueId) store.uniqueId = {};
+  var generatedIds = store.uniqueId;
+  if (document.getElementById(id) || generatedIds[id]) {
+    return uniqueId(prefix);
+  } else {
+    generatedIds[id] = true;
+    return id;
+  }
+}
+// source: http://youmightnotneedjquery.com/
+function hasClass(el, className) {
+  if (el.classList) {
+    return el.classList.contains(className);
+  } else {
+    return new RegExp('(^| )' + className + '( |$)', 'gi').test(el.className);
+  }
+}
+
+// advance
+// binarySearch 二分查找
+function binarySearch(arr, callback, start, end, returnNearestIfNoHit) {
+  var max = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1000;
+
+  var midNum;
+  var mid;
+  if (start == null) {
+    start = 0;
+    end = arr.length - 1;
+  }
+  var i = 0;
+  var r = void 0;
+  while (start >= 0 && start <= end) {
+    if (i >= max) {
+      throw Error('binarySearch: loop times is over ' + max + ', you can increase the limit.');
+    }
+    midNum = Math.floor((end - start) / 2 + start);
+    mid = arr[midNum];
+    r = callback(mid, i);
+    if (r > 0) {
+      end = midNum - 1;
+    } else if (r < 0) {
+      start = midNum + 1;
+    } else {
+      return { index: midNum, value: mid, count: i + 1, hit: true };
+    }
+    i++;
+  }
+  return returnNearestIfNoHit ? { index: midNum, value: mid, count: i + 1, hit: false, bigger: r > 0 } : null;
+}
+function retry(func) {
+  var limitTimes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
+
+  if (!store.retry) store.retry = {};
+  var counters = retry;
+  var name = generateName();
+  counters[name] = 0;
+  return doFunc;
+  function doFunc(arg1, arg2, arg3) {
+    return func(arg1, arg2, arg3).then(function (data) {
+      delete counters[name];
+      return data;
+    }).catch(function (e) {
+      counters[name]++;
+      if (counters[name] >= limitTimes) {
+        delete counters[name];
+        return Promise.reject(e);
+      } else {
+        return doFunc(arg1, arg2, arg3);
+      }
+    });
+  }
+  function generateName() {
+    var name = Math.random() + '';
+    if (counters[name]) {
+      return generateName();
+    } else {
+      return name;
+    }
+  }
+}
 
 var validator = {
   rules: {},
@@ -422,9 +546,8 @@ var validator = {
       name: rule.name,
       message: message,
       field: field
-    };
-    // set state
-    field.valid = false;
+      // set state
+    };field.valid = false;
     validation.valid = false;
   },
   removeFieldError: function removeFieldError(rule, field, validation) {
@@ -525,11 +648,12 @@ var rules = {
     var list = isArray(params[0]) ? params[0] : params;
     return list.indexOf(value) > -1;
   },
+
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
   integer: function integer(_ref12) {
     var value = _ref12.value;
 
-    return (/^-?[1-9]\d*$/.test(value)
-    );
+    return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
   },
   length: function length(_ref13) {
     var value = _ref13.value,
