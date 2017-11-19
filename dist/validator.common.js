@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.4
+ * vue-data-validator v2.2.0
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -134,6 +134,10 @@ var validator = {
       // filed name
       if (!field.name) vm.$set(field, 'name', key);else if (field.name !== key) {
         throw Error('The field name must be same with its key.');
+      }
+      // nameInMessage
+      if (!field.nameInMessage) {
+        field.nameInMessage = getFieldTitle(field);
       }
       // field value
       if (!helperJs.isset(field.value)) vm.$set(field, 'value', null);
@@ -334,12 +338,7 @@ var validator = {
   },
   addFieldError: function addFieldError(rule, field, validation) {
     // compile message
-    var nameInMessage = field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed';
-    var message = rule.message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
-    for (var i in rule.params) {
-      var reg = new RegExp(':params\\[' + i + '\\]', 'g');
-      message = message.replace(reg, rule.params[i]);
-    }
+    var message = resolveErrorMessage(rule, field, validation);
     // if error of this rule hasnt set yet, set it
     // copy errors in order
     if (!field.errors[rule.name]) {
@@ -385,5 +384,55 @@ var validator = {
     });
   }
 };
+
+function getFieldTitle(field) {
+  return field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed';
+}
+
+function resolveErrorMessage(rule, field, validation) {
+  var nameInMessage = field.nameInMessage;
+
+  var message = helperJs.isFunction(rule.message) ? rule.message({ value: field.value, params: rule.params, field: field, fields: validation.fields, validation: validation, Vue: Vue }) : rule.message;
+
+  message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
+  for (var i in rule.params) {
+    var reg = new RegExp(':params\\[' + i + '\\]', 'g');
+    message = message.replace(reg, rule.params[i]);
+  }
+  var m = message.match(/:fieldName\(.+?\)/g);
+  if (m) {
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+      for (var _iterator2 = m[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        var t = _step2.value;
+
+        var fieldName = t.match(/\((.+)\)/)[1];
+        var fld = validation.fields[fieldName];
+        if (!fld) {
+          console.warn('vue-data-validator: error when generate error message. Can\'t found field ' + fieldName + '. Current field is ' + field.name + '.');
+        }
+        var text = fld ? getFieldTitle(fld) : '';
+        message = message.replace(t, text);
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
+    }
+  }
+  return message;
+}
 
 module.exports = validator;

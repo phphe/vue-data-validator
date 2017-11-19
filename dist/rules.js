@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.4
+ * vue-data-validator v2.2.0
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -12,7 +12,7 @@
 }(this, (function () { 'use strict';
 
 /*!
- * helper-js v1.0.24
+ * helper-js v1.0.25
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/helper-js.git
  * Released under the MIT License.
@@ -74,6 +74,7 @@ function max$1(n, max) {
 function studlyCase(str) {
   return str && str[0].toUpperCase() + str.substr(1);
 }
+
 function strRand() {
   var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
   var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';

@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.4
+ * vue-data-validator v2.2.0
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -12,7 +12,7 @@
 }(this, (function (exports) { 'use strict';
 
 /*!
- * helper-js v1.0.24
+ * helper-js v1.0.25
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/helper-js.git
  * Released under the MIT License.
@@ -77,6 +77,7 @@ function max$1(n, max) {
 function studlyCase(str) {
   return str && str[0].toUpperCase() + str.substr(1);
 }
+
 function strRand() {
   var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 8;
   var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
@@ -323,6 +324,10 @@ var validator = {
       if (!field.name) vm.$set(field, 'name', key);else if (field.name !== key) {
         throw Error('The field name must be same with its key.');
       }
+      // nameInMessage
+      if (!field.nameInMessage) {
+        field.nameInMessage = getFieldTitle(field);
+      }
       // field value
       if (!isset(field.value)) vm.$set(field, 'value', null);
       // attach states to field
@@ -522,12 +527,7 @@ var validator = {
   },
   addFieldError: function addFieldError(rule, field, validation) {
     // compile message
-    var nameInMessage = field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed';
-    var message = rule.message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
-    for (var i in rule.params) {
-      var reg = new RegExp(':params\\[' + i + '\\]', 'g');
-      message = message.replace(reg, rule.params[i]);
-    }
+    var message = resolveErrorMessage(rule, field, validation);
     // if error of this rule hasnt set yet, set it
     // copy errors in order
     if (!field.errors[rule.name]) {
@@ -573,6 +573,56 @@ var validator = {
     });
   }
 };
+
+function getFieldTitle(field) {
+  return field.nameInMessage || field.text && field.text.toString().toLowerCase() || field.name || 'unnamed';
+}
+
+function resolveErrorMessage(rule, field, validation) {
+  var nameInMessage = field.nameInMessage;
+
+  var message = isFunction(rule.message) ? rule.message({ value: field.value, params: rule.params, field: field, fields: validation.fields, validation: validation, Vue: Vue }) : rule.message;
+
+  message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
+  for (var i in rule.params) {
+    var reg = new RegExp(':params\\[' + i + '\\]', 'g');
+    message = message.replace(reg, rule.params[i]);
+  }
+  var m = message.match(/:fieldName\(.+?\)/g);
+  if (m) {
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+      for (var _iterator2 = m[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        var t = _step2.value;
+
+        var fieldName = t.match(/\((.+)\)/)[1];
+        var fld = validation.fields[fieldName];
+        if (!fld) {
+          console.warn('vue-data-validator: error when generate error message. Can\'t found field ' + fieldName + '. Current field is ' + field.name + '.');
+        }
+        var text = fld ? getFieldTitle(fld) : '';
+        message = message.replace(t, text);
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
+    }
+  }
+  return message;
+}
 
 var rules = {
   accepted: function accepted(_ref) {
@@ -795,11 +845,11 @@ var en = {
   alpha: 'The :name may only contain letters.',
   alphaDash: 'The :name may only contain letters, numbers, and dashes.',
   alphaNum: 'The :name may only contain letters and numbers.',
-  between: 'The :name must be between :params[0] and :params[1].',
+  between: 'The :name must be between :fieldName(:params[0]) and :fieldName(:params[1]).',
   boolean: 'The :name field must be true or false.',
   date: 'The :name is not a valid date.',
   datetime: 'The :name is not a valid datetime.',
-  different: 'The :name and :params[0] must be different.',
+  different: 'The :name and :fieldName(:params[0]) must be different.',
   email: 'The :name must be a valid email address.',
   in: 'The selected :name is invalid.',
   integer: 'The :name must be an integer.',
@@ -813,8 +863,8 @@ var en = {
   numeric: 'The :name must be a number.',
   regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
-  requiredWith: 'The :name field is required when :params[1] is present.',
-  same: 'The :name and :params[1] must match.',
+  requiredWith: 'The :name field is required when :fieldName(:params[0]) is present.',
+  same: 'The :name and :fieldName(:params[0]) must match.',
   size: 'The :name must be :params[0] characters.',
   string: 'The :name must be a string.',
   // asynchronous rules
@@ -823,35 +873,35 @@ var en = {
 };
 
 var zh_CN = {
-  accepted: '您必须同意:name才能继续。',
-  alpha: ':name仅能包含字母。',
-  alphaDash: ':name仅能包含字母，数字，破折号和下划线。',
-  alphaNum: ':name仅能包含字母和数字。',
-  between: ':name必须在:params[0]和:params[1]之间。',
-  boolean: ':name必须为true或false。',
-  date: ':name必须是一个正确格式的日期。',
-  datetime: ':name必须是一个正确格式的日期时间。',
-  different: ':name不能与:params[0]相同。',
-  email: ':name不是一个正确的邮箱。',
-  in: '选择的:name不可用。',
-  integer: ':name必须是整数。',
-  length: ':name必须包含:params[0]个字符。',
-  lengthBetween: ':name的长度须在:params[0]和:params[1]之间。',
-  max: ':name不能超过:params[0]。',
-  maxLength: ':name的长度不能超过:params[0]。',
-  min: ':name不能低于:params[0]。',
-  minLength: ':name的长度不能低于:params[0]。',
-  notIn: '选择的:name不可用。',
-  numeric: ':name不是一个正确的数字。',
-  regex: ':name格式错误。',
-  required: '请填写:name。',
-  requiredWith: '请填写:name。当:params[1]不为空时，:name必填。',
-  same: ':name必须与:params[1]相同。',
-  size: ':name必须有:params[0]个字符。',
-  string: ':name必须是字符串。',
+  accepted: "\u60A8\u5FC5\u987B\u540C\u610F:name\u624D\u80FD\u7EE7\u7EED\u3002",
+  alpha: ":name\u4EC5\u80FD\u5305\u542B\u5B57\u6BCD\u3002",
+  alphaDash: ":name\u4EC5\u80FD\u5305\u542B\u5B57\u6BCD\uFF0C\u6570\u5B57\uFF0C\u7834\u6298\u53F7\u548C\u4E0B\u5212\u7EBF\u3002",
+  alphaNum: ":name\u4EC5\u80FD\u5305\u542B\u5B57\u6BCD\u548C\u6570\u5B57\u3002",
+  between: ":name\u5FC5\u987B\u5728:fieldName(:params[0])\u548C:fieldName(:params[1])\u4E4B\u95F4\u3002",
+  boolean: ":name\u5FC5\u987B\u4E3Atrue\u6216false\u3002",
+  date: ":name\u5FC5\u987B\u662F\u4E00\u4E2A\u6B63\u786E\u683C\u5F0F\u7684\u65E5\u671F\u3002",
+  datetime: ":name\u5FC5\u987B\u662F\u4E00\u4E2A\u6B63\u786E\u683C\u5F0F\u7684\u65E5\u671F\u65F6\u95F4\u3002",
+  different: ":name\u4E0D\u80FD\u4E0E:fieldName(:params[0])\u76F8\u540C\u3002",
+  email: ":name\u4E0D\u662F\u4E00\u4E2A\u6B63\u786E\u7684\u90AE\u7BB1\u3002",
+  in: "\u9009\u62E9\u7684:name\u4E0D\u53EF\u7528\u3002",
+  integer: ":name\u5FC5\u987B\u662F\u6574\u6570\u3002",
+  length: ":name\u5FC5\u987B\u5305\u542B:params[0]\u4E2A\u5B57\u7B26\u3002",
+  lengthBetween: ":name\u7684\u957F\u5EA6\u987B\u5728:params[0]\u548C:params[1]\u4E4B\u95F4\u3002",
+  max: ":name\u4E0D\u80FD\u8D85\u8FC7:params[0]\u3002",
+  maxLength: ":name\u7684\u957F\u5EA6\u4E0D\u80FD\u8D85\u8FC7:params[0]\u3002",
+  min: ":name\u4E0D\u80FD\u4F4E\u4E8E:params[0]\u3002",
+  minLength: ":name\u7684\u957F\u5EA6\u4E0D\u80FD\u4F4E\u4E8E:params[0]\u3002",
+  notIn: "\u9009\u62E9\u7684:name\u4E0D\u53EF\u7528\u3002",
+  numeric: ":name\u4E0D\u662F\u4E00\u4E2A\u6B63\u786E\u7684\u6570\u5B57\u3002",
+  regex: ":name\u683C\u5F0F\u9519\u8BEF\u3002",
+  required: "\u8BF7\u586B\u5199:name\u3002",
+  requiredWith: "\u8BF7\u586B\u5199:name\u3002\u5F53:fieldName(:params[0])\u4E0D\u4E3A\u7A7A\u65F6\uFF0C:name\u5FC5\u586B\u3002",
+  same: ":name\u5FC5\u987B\u4E0E:fieldName(:params[0])\u76F8\u540C\u3002",
+  size: ":name\u5FC5\u987B\u6709:params[0]\u4E2A\u5B57\u7B26\u3002",
+  string: ":name\u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u3002",
   // asynchronous rules
-  remoteCheck: ':name错误。',
-  remoteNotExisted: ':name已存在。'
+  remoteCheck: ":name\u9519\u8BEF\u3002",
+  remoteNotExisted: ":name\u5DF2\u5B58\u5728\u3002"
 };
 
 exports.validator = validator;

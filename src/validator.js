@@ -106,6 +106,10 @@ export default {
       else if (field.name !== key) {
         throw Error('The field name must be same with its key.')
       }
+      // nameInMessage
+      if (!field.nameInMessage) {
+        field.nameInMessage = getFieldTitle(field)
+      }
       // field value
       if (!isset(field.value)) vm.$set(field, 'value', null)
       // attach states to field
@@ -260,12 +264,7 @@ export default {
   },
   addFieldError(rule, field, validation) {
     // compile message
-    const nameInMessage = field.nameInMessage || (field.text && field.text.toString().toLowerCase()) || field.name || 'unnamed'
-    let message = rule.message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value)
-    for (const i in rule.params) {
-      const reg = new RegExp(':params\\[' + i + '\\]', 'g')
-      message = message.replace(reg, rule.params[i])
-    }
+    const message = resolveErrorMessage(rule, field, validation)
     // if error of this rule hasnt set yet, set it
     // copy errors in order
     if (!field.errors[rule.name]) {
@@ -307,4 +306,34 @@ export default {
     field.valid = true
     validation.valid = Object.values(validation.fields).every(field => field.valid)
   }
+}
+
+function getFieldTitle(field) {
+  return field.nameInMessage || (field.text && field.text.toString().toLowerCase()) || field.name || 'unnamed'
+}
+
+function resolveErrorMessage(rule, field, validation) {
+  const {nameInMessage} = field
+  let message = isFunction(rule.message)
+  ? rule.message({value: field.value, params: rule.params, field, fields: validation.fields, validation, Vue})
+  : rule.message
+
+  message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value)
+  for (const i in rule.params) {
+    const reg = new RegExp(':params\\[' + i + '\\]', 'g')
+    message = message.replace(reg, rule.params[i])
+  }
+  const m = message.match(/:fieldName\(.+?\)/g)
+  if (m) {
+    for (const t of m) {
+      const fieldName = t.match(/\((.+)\)/)[1]
+      const fld = validation.fields[fieldName]
+      if (!fld) {
+        console.warn(`vue-data-validator: error when generate error message. Can\'t found field ${fieldName}. Current field is ${field.name}.`)
+      }
+      const text = fld ? getFieldTitle(fld) : ''
+      message = message.replace(t, text)
+    }
+  }
+  return message
 }

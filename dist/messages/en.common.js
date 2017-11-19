@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.1.4
+ * vue-data-validator v2.2.0
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -12,11 +12,11 @@ var en = {
   alpha: 'The :name may only contain letters.',
   alphaDash: 'The :name may only contain letters, numbers, and dashes.',
   alphaNum: 'The :name may only contain letters and numbers.',
-  between: 'The :name must be between :params[0] and :params[1].',
+  between: 'The :name must be between :fieldName(:params[0]) and :fieldName(:params[1]).',
   boolean: 'The :name field must be true or false.',
   date: 'The :name is not a valid date.',
   datetime: 'The :name is not a valid datetime.',
-  different: 'The :name and :params[0] must be different.',
+  different: 'The :name and :fieldName(:params[0]) must be different.',
   email: 'The :name must be a valid email address.',
   in: 'The selected :name is invalid.',
   integer: 'The :name must be an integer.',
@@ -30,8 +30,8 @@ var en = {
   numeric: 'The :name must be a number.',
   regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
-  requiredWith: 'The :name field is required when :params[1] is present.',
-  same: 'The :name and :params[1] must match.',
+  requiredWith: 'The :name field is required when :fieldName(:params[0]) is present.',
+  same: 'The :name and :fieldName(:params[0]) must match.',
   size: 'The :name must be :params[0] characters.',
   string: 'The :name must be a string.',
   // asynchronous rules
