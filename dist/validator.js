@@ -323,7 +323,7 @@ var validator = {
         field.nameInMessage = getFieldTitle(field);
       }
       // field value
-      if (!isset(field.value)) vm.$set(field, 'value', null);
+      vm.$set(field, 'value', isset(field.value) ? field.value : null);
       // attach states to field
       vm.$set(field, 'dirty', false);
       vm.$set(field, 'valid', false);
