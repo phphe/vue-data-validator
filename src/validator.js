@@ -156,7 +156,7 @@ export default {
           })
         }
       }
-      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler)
+      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, {deep: field.deep})
       vm.$set(field, 'watcher', watcher)
     }
   },

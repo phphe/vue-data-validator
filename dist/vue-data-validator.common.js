@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.0
+ * vue-data-validator v2.2.1
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -192,7 +192,7 @@ var validator = {
           });
         }
       };
-      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler);
+      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, { deep: field.deep });
       vm.$set(field, 'watcher', watcher);
     };
 
