@@ -43,23 +43,23 @@ const rules = {
     return reg.test(value)
   },
   length({value, params}) {
-    return (value || '').toString().length === parseInt(params[0])
+    return (value || '').length === parseInt(params[0])
   },
   lengthBetween({value, params}) {
-    const len = (value || '').toString().length
+    const len = (value || '').length
     return (params[0] <= len && len <= params[1])
   },
   max({value, params}) {
     return value <= params[0]
   },
   maxLength({value, params}) {
-    return (value || '').toString().length <= params[0]
+    return (value || '').length <= params[0]
   },
   min({value, params}) {
     return value >= params[0]
   },
   minLength({value, params}) {
-    return (value || '').toString().length >= params[0]
+    return (value || '').length >= params[0]
   },
   notIn({value, params}) {
     const list = isArray(params[0]) ? params[0] : params
@@ -95,7 +95,7 @@ const rules = {
     sensitive: true
   },
   size({value, params}) {
-    return (value || '').toString().length === parseInt(params[0])
+    return (value || '').length === parseInt(params[0])
   },
   string({value}) {
     return isString(value)

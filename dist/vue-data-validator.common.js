@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.1
+ * vue-data-validator v2.2.2
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -521,13 +521,13 @@ var rules = {
     var value = _ref13.value,
         params = _ref13.params;
 
-    return (value || '').toString().length === parseInt(params[0]);
+    return (value || '').length === parseInt(params[0]);
   },
   lengthBetween: function lengthBetween(_ref14) {
     var value = _ref14.value,
         params = _ref14.params;
 
-    var len = (value || '').toString().length;
+    var len = (value || '').length;
     return params[0] <= len && len <= params[1];
   },
   max: function max(_ref15) {
@@ -540,7 +540,7 @@ var rules = {
     var value = _ref16.value,
         params = _ref16.params;
 
-    return (value || '').toString().length <= params[0];
+    return (value || '').length <= params[0];
   },
   min: function min(_ref17) {
     var value = _ref17.value,
@@ -552,7 +552,7 @@ var rules = {
     var value = _ref18.value,
         params = _ref18.params;
 
-    return (value || '').toString().length >= params[0];
+    return (value || '').length >= params[0];
   },
   notIn: function notIn(_ref19) {
     var value = _ref19.value,
@@ -619,7 +619,7 @@ var rules = {
     var value = _ref26.value,
         params = _ref26.params;
 
-    return (value || '').toString().length === parseInt(params[0]);
+    return (value || '').length === parseInt(params[0]);
   },
   string: function string(_ref27) {
     var value = _ref27.value;
