@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.2
+ * vue-data-validator v2.2.3
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -24,7 +24,7 @@ var zh_CN = {
   email: ":name\u4E0D\u662F\u4E00\u4E2A\u6B63\u786E\u7684\u90AE\u7BB1\u3002",
   in: "\u9009\u62E9\u7684:name\u4E0D\u53EF\u7528\u3002",
   integer: ":name\u5FC5\u987B\u662F\u6574\u6570\u3002",
-  length: ":name\u5FC5\u987B\u5305\u542B:params[0]\u4E2A\u5B57\u7B26\u3002",
+  length: ":name\u7684\u957F\u5EA6\u5FC5\u987B\u662F:params[0]\u3002",
   lengthBetween: ":name\u7684\u957F\u5EA6\u987B\u5728:params[0]\u548C:params[1]\u4E4B\u95F4\u3002",
   max: ":name\u4E0D\u80FD\u8D85\u8FC7:params[0]\u3002",
   maxLength: ":name\u7684\u957F\u5EA6\u4E0D\u80FD\u8D85\u8FC7:params[0]\u3002",
@@ -36,7 +36,7 @@ var zh_CN = {
   required: "\u8BF7\u586B\u5199:name\u3002",
   requiredWith: "\u8BF7\u586B\u5199:name\u3002\u5F53:fieldName(:params[0])\u4E0D\u4E3A\u7A7A\u65F6\uFF0C:name\u5FC5\u586B\u3002",
   same: ":name\u5FC5\u987B\u4E0E:fieldName(:params[0])\u76F8\u540C\u3002",
-  size: ":name\u5FC5\u987B\u6709:params[0]\u4E2A\u5B57\u7B26\u3002",
+  size: ":name\u7684\u957F\u5EA6\u5FC5\u987B\u662F:params[0]\u3002",
   string: ":name\u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u3002",
   // asynchronous rules
   remoteCheck: ":name\u9519\u8BEF\u3002",

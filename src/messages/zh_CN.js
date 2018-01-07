@@ -11,7 +11,7 @@ export default {
   email: `:name不是一个正确的邮箱。`,
   in: `选择的:name不可用。`,
   integer: `:name必须是整数。`,
-  length: `:name必须包含:params[0]个字符。`,
+  length: `:name的长度必须是:params[0]。`,
   lengthBetween: `:name的长度须在:params[0]和:params[1]之间。`,
   max: `:name不能超过:params[0]。`,
   maxLength: `:name的长度不能超过:params[0]。`,
@@ -23,7 +23,7 @@ export default {
   required: `请填写:name。`,
   requiredWith: `请填写:name。当:fieldName(:params[0])不为空时，:name必填。`,
   same: `:name必须与:fieldName(:params[0])相同。`,
-  size: `:name必须有:params[0]个字符。`,
+  size: `:name的长度必须是:params[0]。`,
   string: `:name必须是字符串。`,
     // asynchronous rules
   remoteCheck: `:name错误。`,

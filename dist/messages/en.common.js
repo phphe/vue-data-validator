@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.2
+ * vue-data-validator v2.2.3
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -20,19 +20,19 @@ var en = {
   email: 'The :name must be a valid email address.',
   in: 'The selected :name is invalid.',
   integer: 'The :name must be an integer.',
-  length: 'The :name must be :params[0] characters.',
-  lengthBetween: 'The :name must be between :params[0] and :params[1] characters.',
+  length: 'The :name length must be :params[0].',
+  lengthBetween: 'The :name length must be between :params[0] and :params[1].',
   max: 'The :name may not be greater than :params[0].',
-  maxLength: 'The :name may not be greater than :params[0] characters.',
+  maxLength: 'The :name length may not be greater than :params[0].',
   min: 'The :name must be at least :params[0].',
-  minLength: 'The :name must be at least :params[0] characters.',
+  minLength: 'The :name length must be at least :params[0].',
   notIn: 'The selected :name is invalid.',
   numeric: 'The :name must be a number.',
   regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
   requiredWith: 'The :name field is required when :fieldName(:params[0]) is present.',
   same: 'The :name and :fieldName(:params[0]) must match.',
-  size: 'The :name must be :params[0] characters.',
+  size: 'The :name length must be :params[0].',
   string: 'The :name must be a string.',
   // asynchronous rules
   remoteCheck: 'The :name is invalid.',
