@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.3
+ * vue-data-validator v2.2.4
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -789,12 +789,24 @@ var rules = {
       return !empty(fields[params[0]].value);
     }
   },
-  same: {
+  requiredIf: {
     handler: function handler(_ref25) {
-      var value = _ref25.value,
-          params = _ref25.params,
-          field = _ref25.field,
-          fields = _ref25.fields;
+      var value = _ref25.value;
+
+      return !empty(value);
+    },
+
+    sensitive: true,
+    required: function required(arg) {
+      return arg.params[0](arg);
+    }
+  },
+  same: {
+    handler: function handler(_ref26) {
+      var value = _ref26.value,
+          params = _ref26.params,
+          field = _ref26.field,
+          fields = _ref26.fields;
 
       var relatedField = fields[params[0]];
       return value === relatedField.value;
@@ -802,35 +814,35 @@ var rules = {
 
     sensitive: true
   },
-  size: function size(_ref26) {
-    var value = _ref26.value,
-        params = _ref26.params;
+  size: function size(_ref27) {
+    var value = _ref27.value,
+        params = _ref27.params;
 
     return (value || '').length === parseInt(params[0]);
   },
-  string: function string(_ref27) {
-    var value = _ref27.value;
+  string: function string(_ref28) {
+    var value = _ref28.value;
 
     return isString(value);
   },
 
   // asynchronous rules
   // Vue.http must be available
-  remoteCheck: function remoteCheck(_ref28) {
-    var value = _ref28.value,
-        params = _ref28.params,
-        field = _ref28.field,
-        fields = _ref28.fields,
-        validation = _ref28.validation,
-        Vue = _ref28.Vue;
+  remoteCheck: function remoteCheck(_ref29) {
+    var value = _ref29.value,
+        params = _ref29.params,
+        field = _ref29.field,
+        fields = _ref29.fields,
+        validation = _ref29.validation,
+        Vue = _ref29.Vue;
 
     var expected = isArray(params[1]) ? params[1] : [params[1]];
     if (expected.includes(value)) {
       return true;
     }
     var url = params[0];
-    return Vue.http.post(url, { value: value }).then(function (_ref29) {
-      var data = _ref29.data;
+    return Vue.http.post(url, { value: value }).then(function (_ref30) {
+      var data = _ref30.data;
 
       return data ? Promise.resolve() : Promise.reject(new Error('invalid'));
     });
@@ -864,6 +876,7 @@ var en = {
   regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
   requiredWith: 'The :name field is required when :fieldName(:params[0]) is present.',
+  requiredIf: 'The :name field is required.',
   same: 'The :name and :fieldName(:params[0]) must match.',
   size: 'The :name length must be :params[0].',
   string: 'The :name must be a string.',
@@ -896,6 +909,7 @@ var zh_CN = {
   regex: ":name\u683C\u5F0F\u9519\u8BEF\u3002",
   required: "\u8BF7\u586B\u5199:name\u3002",
   requiredWith: "\u8BF7\u586B\u5199:name\u3002\u5F53:fieldName(:params[0])\u4E0D\u4E3A\u7A7A\u65F6\uFF0C:name\u5FC5\u586B\u3002",
+  requiredIf: "\u8BF7\u586B\u5199:name\u3002",
   same: ":name\u5FC5\u987B\u4E0E:fieldName(:params[0])\u76F8\u540C\u3002",
   size: ":name\u7684\u957F\u5EA6\u5FC5\u987B\u662F:params[0]\u3002",
   string: ":name\u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u3002",

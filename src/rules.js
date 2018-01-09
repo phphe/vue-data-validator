@@ -87,6 +87,15 @@ const rules = {
       return !empty(fields[params[0]].value)
     }
   },
+  requiredIf: {
+    handler({value}) {
+      return !empty(value)
+    },
+    sensitive: true,
+    required(arg) {
+      return arg.params[0](arg)
+    }
+  },
   same: {
     handler({value, params, field, fields}) {
       const relatedField = fields[params[0]]

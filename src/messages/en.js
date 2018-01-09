@@ -22,6 +22,7 @@ export default {
   regex: 'The :name format is invalid.',
   required: 'The :name field is required.',
   requiredWith: 'The :name field is required when :fieldName(:params[0]) is present.',
+  requiredIf: 'The :name field is required.',
   same: 'The :name and :fieldName(:params[0]) must match.',
   size: 'The :name length must be :params[0].',
   string: 'The :name must be a string.',

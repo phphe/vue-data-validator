@@ -22,6 +22,7 @@ export default {
   regex: `:name格式错误。`,
   required: `请填写:name。`,
   requiredWith: `请填写:name。当:fieldName(:params[0])不为空时，:name必填。`,
+  requiredIf: `请填写:name。`,
   same: `:name必须与:fieldName(:params[0])相同。`,
   size: `:name的长度必须是:params[0]。`,
   string: `:name必须是字符串。`,

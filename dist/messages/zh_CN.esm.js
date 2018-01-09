@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.3
+ * vue-data-validator v2.2.4
  * phphe <phphe@outlook.com> (https://github.com/phphe)
  * https://github.com/phphe/vue-data-validator.git
  * Released under the MIT License.
@@ -29,6 +29,7 @@ var zh_CN = {
   regex: ":name\u683C\u5F0F\u9519\u8BEF\u3002",
   required: "\u8BF7\u586B\u5199:name\u3002",
   requiredWith: "\u8BF7\u586B\u5199:name\u3002\u5F53:fieldName(:params[0])\u4E0D\u4E3A\u7A7A\u65F6\uFF0C:name\u5FC5\u586B\u3002",
+  requiredIf: "\u8BF7\u586B\u5199:name\u3002",
   same: ":name\u5FC5\u987B\u4E0E:fieldName(:params[0])\u76F8\u540C\u3002",
   size: ":name\u7684\u957F\u5EA6\u5FC5\u987B\u662F:params[0]\u3002",
   string: ":name\u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u3002",
