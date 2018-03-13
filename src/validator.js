@@ -44,10 +44,17 @@ export default {
         return this
       },
       check() {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           if (this.validating) {
-            reject(new Error('validating'))
-          } else if (!this.valid) {
+            if (!this._checkResolves) {
+              this._checkResolves = []
+            }
+            const waitValidating = new Promise((resolve, reject) => {
+              this._checkResolves.push(resolve)
+            })
+            await waitValidating
+          }
+          if (!this.valid) {
             this.setDirty(true)
             reject(new Error('invalid'))
           } else {
@@ -219,6 +226,14 @@ export default {
         field.validating = false
         // set state: validating of validation
         validation.validating = Object.values(validation.fields).some(field => field.validating)
+        if (!validation.validating) {
+          if (validation._checkResolves) {
+            validation._checkResolves.forEach(resolve => {
+              resolve()
+            })
+            validation._checkResolves = null
+          }
+        }
       }
     })
   },
