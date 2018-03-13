@@ -44,22 +44,23 @@ export default {
         return this
       },
       check() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
           if (this.validating) {
             if (!this._checkResolves) {
               this._checkResolves = []
             }
-            const waitValidating = new Promise((resolve, reject) => {
-              this._checkResolves.push(resolve)
-            })
-            await waitValidating
           }
-          if (!this.valid) {
-            this.setDirty(true)
-            reject(new Error('invalid'))
-          } else {
-            resolve(this.getValues())
-          }
+          const waitValidating = this.validating ? new Promise((resolve, reject) => {
+            this._checkResolves.push(resolve)
+          }) : Promise.resolve()
+          return waitValidating.then(() => {
+            if (!this.valid) {
+              this.setDirty(true)
+              reject(new Error('invalid'))
+            } else {
+              resolve(this.getValues())
+            }
+          })
         })
       },
       unwatch() {
