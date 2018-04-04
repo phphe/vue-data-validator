@@ -1,10 +1,8 @@
 /*!
- * vue-data-validator v2.2.6
- * phphe <phphe@outlook.com> (https://github.com/phphe)
- * https://github.com/phphe/vue-data-validator.git
+ * vue-data-validator v2.2.7
+ * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
-
 var zh_CN = {
   accepted: "\u60A8\u5FC5\u987B\u540C\u610F:name\u624D\u80FD\u7EE7\u7EED\u3002",
   alpha: ":name\u4EC5\u80FD\u5305\u542B\u5B57\u6BCD\u3002",

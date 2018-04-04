@@ -1,12 +1,8 @@
 /*!
- * vue-data-validator v2.2.6
- * phphe <phphe@outlook.com> (https://github.com/phphe)
- * https://github.com/phphe/vue-data-validator.git
+ * vue-data-validator v2.2.7
+ * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
-
-'use strict';
-
 var en = {
   accepted: 'The :name must be accepted.',
   alpha: 'The :name may only contain letters.',
@@ -40,4 +36,4 @@ var en = {
   remoteNotExisted: 'The :name already exists.'
 };
 
-module.exports = en;
+export default en;

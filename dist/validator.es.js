@@ -1,13 +1,9 @@
 /*!
- * vue-data-validator v2.2.6
- * phphe <phphe@outlook.com> (https://github.com/phphe)
- * https://github.com/phphe/vue-data-validator.git
+ * vue-data-validator v2.2.7
+ * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
-
-'use strict';
-
-var helperJs = require('helper-js');
+import { isset, isFunction, isPromise, objectMap, empty } from 'helper-js';
 
 var validator = {
   rules: {},
@@ -18,6 +14,7 @@ var validator = {
   // The following methods are not recommended
   install: function install(Vue) {
     Vue.validator = Vue.prototype.$validator = this;
+
     Vue.prototype.$validate = function (validation, fields) {
       return Vue.validator.validate(validation, fields, this);
     };
@@ -28,8 +25,8 @@ var validator = {
     // clear old watchers and reset states
     validation.clear && validation.clear();
     this.initValidation(validation, fields, vm);
-    this.initFields(validation, vm);
-    // validate all fields at first
+    this.initFields(validation, vm); // validate all fields at first
+
     Object.values(fields).forEach(function (item) {
       return _this.validateField(item, validation);
     });
@@ -48,7 +45,7 @@ var validator = {
         return this.valid && !this.validating;
       },
       getValues: function getValues() {
-        return helperJs.objectMap(this.fields, function (item) {
+        return objectMap(this.fields, function (item) {
           return item.value;
         });
       },
@@ -58,6 +55,7 @@ var validator = {
             this.fields[key].value = values[key];
           }
         }
+
         return this;
       },
       setDirty: function setDirty(to) {
@@ -76,12 +74,14 @@ var validator = {
               _this2._checkResolves = [];
             }
           }
+
           var waitValidating = _this2.validating ? new Promise(function (resolve, reject) {
             _this2._checkResolves.push(resolve);
           }) : Promise.resolve();
           return waitValidating.then(function () {
             if (!_this2.valid) {
               _this2.setDirty(true);
+
               reject(new Error('invalid'));
             } else {
               resolve(_this2.getValues());
@@ -130,6 +130,7 @@ var validator = {
         return errors;
       }
     };
+
     for (var key in defaultValidation) {
       vm.$set(validation, key, defaultValidation[key]);
     }
@@ -138,18 +139,19 @@ var validator = {
     var _this3 = this;
 
     var _loop = function _loop(key) {
-      var field = validation.fields[key];
-      // filed name
+      var field = validation.fields[key]; // filed name
+
       if (!field.name) vm.$set(field, 'name', key);else if (field.name !== key) {
         throw Error('The field name must be same with its key.');
-      }
-      // nameInMessage
+      } // nameInMessage
+
       if (!field.nameInMessage) {
         field.nameInMessage = getFieldTitle(field);
-      }
-      // field value
-      vm.$set(field, 'value', helperJs.isset(field.value) ? field.value : null);
-      // attach states to field
+      } // field value
+
+
+      vm.$set(field, 'value', isset(field.value) ? field.value : null); // attach states to field
+
       vm.$set(field, 'dirty', false);
       vm.$set(field, 'valid', false);
       vm.$set(field, 'errors', {});
@@ -167,30 +169,32 @@ var validator = {
             return field.valid ? _this3.validClass : _this3.invalidClass;
           }
         }
+
         return null;
-      });
-      // find field has sensitive rule
+      }); // find field has sensitive rule
+
       var firstSensitiveRule = Object.values(field._resolvedRules).find(function (item) {
         return item.sensitive;
       });
-      if (firstSensitiveRule) validation._sensitiveFields.push(field);
-      // watcher
+      if (firstSensitiveRule) validation._sensitiveFields.push(field); // watcher
+
       var watcher = {
         getValue: function getValue() {
           return field.value;
         },
-
         handler: function handler(val) {
-          if (validation.isPause) return;
-          // set dirty
+          if (validation.isPause) return; // set dirty
+
           if (field._ignoreDirtyOnce) {
             field._ignoreDirtyOnce = false;
           } else {
             field.dirty = true;
             validation.dirty = true;
           }
-          _this3.validateField(field, validation);
-          // validate other sensitive field
+
+          _this3.validateField(field, validation); // validate other sensitive field
+
+
           validation._sensitiveFields.filter(function (item) {
             return item !== field;
           }).forEach(function (item) {
@@ -198,7 +202,9 @@ var validator = {
           });
         }
       };
-      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, { deep: field.deep });
+      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, {
+        deep: field.deep
+      });
       vm.$set(field, 'watcher', watcher);
     };
 
@@ -208,27 +214,34 @@ var validator = {
   },
   resolveRules: function resolveRules(field) {
     var r = {};
+
     if (field.rules) {
       var rules = field.rules.split('|');
+
       for (var k in rules) {
         // get params
         var arr = rules[k].split(':');
         var params = arr[1] ? arr[1].split(',') : [];
         var rule = arr[0];
+
         if (field.ruleParams && field.ruleParams[rule]) {
           params = params.concat(field.ruleParams[rule]);
-        }
-        // get rule obj
+        } // get rule obj
+
+
         var ruleObj = field.customRules && field.customRules[rule] || this.rules[rule];
-        if (helperJs.isFunction(ruleObj)) {
+
+        if (isFunction(ruleObj)) {
           ruleObj = {
             handler: ruleObj
           };
         }
+
         if (ruleObj == null) {
-          throw Error('Rule \'' + rule + '\' of field \'' + field.name + '\' is not found.');
-        }
-        // result
+          throw Error("Rule '".concat(rule, "' of field '").concat(field.name, "' is not found."));
+        } // result
+
+
         r[rule] = {
           name: rule,
           params: params,
@@ -240,6 +253,7 @@ var validator = {
         };
       }
     }
+
     return r;
   },
   validateField: function validateField(field, validation) {
@@ -250,40 +264,20 @@ var validator = {
     field._validationId = validationId;
     validation.validating = true;
     field.validating = true;
-    this.removeFieldAllErrors(field, validation);
-    //
+    this.removeFieldAllErrors(field, validation); //
+
     var rules = Object.values(field._resolvedRules);
     var queue = Promise.resolve(true);
 
-    var _loop2 = function _loop2(rule) {
+    var _loop2 = function _loop2() {
+      var rule = rules[_i];
       queue = queue.then(function () {
         return _this4.validateRule(rule, field, validation, validationId);
       });
     };
 
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-      for (var _iterator = rules[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var rule = _step.value;
-
-        _loop2(rule);
-      }
-    } catch (err) {
-      _didIteratorError = true;
-      _iteratorError = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-          _iterator.return();
-        }
-      } finally {
-        if (_didIteratorError) {
-          throw _iteratorError;
-        }
-      }
+    for (var _i = 0; _i < rules.length; _i++) {
+      _loop2();
     }
 
     queue.then(function () {
@@ -294,16 +288,18 @@ var validator = {
       if (completed) {
         // set state: validating of field
         field._validationId = null;
-        field.validating = false;
-        // set state: validating of validation
+        field.validating = false; // set state: validating of validation
+
         validation.validating = Object.values(validation.fields).some(function (field) {
           return field.validating;
         });
+
         if (!validation.validating) {
           if (validation._checkResolves) {
             validation._checkResolves.forEach(function (resolve) {
               resolve();
             });
+
             validation._checkResolves = null;
           }
         }
@@ -315,7 +311,7 @@ var validator = {
 
     //
     if (rule.required != null) {
-      field.required = !helperJs.isFunction(rule.required) ? rule.required : rule.required({
+      field.required = !isFunction(rule.required) ? rule.required : rule.required({
         value: field.value,
         params: rule.params,
         field: field,
@@ -323,10 +319,11 @@ var validator = {
         validation: validation,
         Vue: validation.vm.$root.constructor
       });
-    }
-    //
+    } //
+
+
     return new Promise(function (resolve, reject) {
-      if (field.required || !helperJs.empty(field.value)) {
+      if (field.required || !empty(field.value)) {
         var isValid = rule.handler({
           value: field.value,
           params: rule.params,
@@ -335,16 +332,18 @@ var validator = {
           validation: validation,
           Vue: validation.vm.$root.constructor
         });
-        if (!helperJs.isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'));
+        if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'));
         isValid.then(function () {
-          if (validationId !== field._validationId) reject(new Error('expired'));
-          //
+          if (validationId !== field._validationId) reject(new Error('expired')); //
+
           _this5.removeFieldError(rule, field, validation);
+
           resolve();
         }).catch(function (error) {
-          if (validationId !== field._validationId) reject(new Error('expired'));
-          //
+          if (validationId !== field._validationId) reject(new Error('expired')); //
+
           _this5.addFieldError(rule, field, validation);
+
           reject(error);
         });
       } else {
@@ -354,11 +353,12 @@ var validator = {
   },
   addFieldError: function addFieldError(rule, field, validation) {
     // compile message
-    var message = resolveErrorMessage(rule, field, validation);
-    // if error of this rule hasnt set yet, set it
+    var message = resolveErrorMessage(rule, field, validation); // if error of this rule hasnt set yet, set it
     // copy errors in order
+
     if (!field.errors[rule.name]) {
       var errors = {};
+
       for (var k in field._resolvedRules) {
         if (field.errors[k]) {
           errors[k] = field.errors[k];
@@ -366,34 +366,39 @@ var validator = {
           errors[k] = {};
         }
       }
+
       field.errors = errors;
-    }
-    // set error
+    } // set error
+
+
     field.errors[rule.name] = {
       name: rule.name,
       message: message,
-      field: field
-      // set state
-    };field.valid = false;
+      field: field // set state
+
+    };
+    field.valid = false;
     validation.valid = false;
   },
   removeFieldError: function removeFieldError(rule, field, validation) {
     var errors = {};
+
     for (var k in field.errors) {
       if (k !== rule.name) {
         errors[k] = field.errors[k];
       }
     }
-    field.errors = errors;
-    // set state
+
+    field.errors = errors; // set state
+
     field.valid = Object.keys(field.errors).length === 0;
     validation.valid = Object.values(validation.fields).every(function (field) {
       return field.valid;
     });
   },
   removeFieldAllErrors: function removeFieldAllErrors(field, validation) {
-    field.errors = {};
-    // set state
+    field.errors = {}; // set state
+
     field.valid = true;
     validation.valid = Object.values(validation.fields).every(function (field) {
       return field.valid;
@@ -407,48 +412,58 @@ function getFieldTitle(field) {
 
 function resolveErrorMessage(rule, field, validation) {
   var nameInMessage = field.nameInMessage;
-
-  var message = helperJs.isFunction(rule.message) ? rule.message({ value: field.value, params: rule.params, field: field, fields: validation.fields, validation: validation, Vue: Vue }) : rule.message;
-
+  var message = isFunction(rule.message) ? rule.message({
+    value: field.value,
+    params: rule.params,
+    field: field,
+    fields: validation.fields,
+    validation: validation,
+    Vue: Vue
+  }) : rule.message;
   message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
+
   for (var i in rule.params) {
     var reg = new RegExp(':params\\[' + i + '\\]', 'g');
     message = message.replace(reg, rule.params[i]);
   }
+
   var m = message.match(/:fieldName\(.+?\)/g);
+
   if (m) {
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
     try {
-      for (var _iterator2 = m[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-        var t = _step2.value;
-
+      for (var _iterator = m[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var t = _step.value;
         var fieldName = t.match(/\((.+)\)/)[1];
         var fld = validation.fields[fieldName];
+
         if (!fld) {
-          console.warn('vue-data-validator: error when generate error message. Can\'t found field ' + fieldName + '. Current field is ' + field.name + '.');
+          console.warn("vue-data-validator: error when generate error message. Can't found field ".concat(fieldName, ". Current field is ").concat(field.name, "."));
         }
+
         var text = fld ? getFieldTitle(fld) : '';
         message = message.replace(t, text);
       }
     } catch (err) {
-      _didIteratorError2 = true;
-      _iteratorError2 = err;
+      _didIteratorError = true;
+      _iteratorError = err;
     } finally {
       try {
-        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-          _iterator2.return();
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
         }
       } finally {
-        if (_didIteratorError2) {
-          throw _iteratorError2;
+        if (_didIteratorError) {
+          throw _iteratorError;
         }
       }
     }
   }
+
   return message;
 }
 
-module.exports = validator;
+export default validator;
