@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.9
+ * vue-data-validator v2.2.10
  * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
@@ -564,19 +564,82 @@
         vm.$set(field, 'required', false);
         vm.$set(field, 'validating', false);
         vm.$set(field, '_resolvedRules', _this3.resolveRules(field));
-        vm.$set(field, 'isValidationErrorsVisible', function () {
-          return field.rules && !field.validating && field.dirty && !field.valid;
-        });
-        vm.$set(field, 'getValidationClass', function () {
-          if (field.rules && field.dirty) {
-            if (field.validating) {
-              return _this3.validatingClass;
-            } else {
-              return field.valid ? _this3.validClass : _this3.invalidClass;
+        vm.$set(field, 'isValidationErrorsVisible', function (fields) {
+          if (!fields) {
+            fields = [field];
+          }
+
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = fields[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var fld = _step.value;
+
+              if (fld.rules && fld.dirty && !field.validating) {
+                if (!field.valid) {
+                  return true;
+                }
+              }
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
             }
           }
 
-          return null;
+          return false;
+        });
+        vm.$set(field, 'getValidationClass', function (fields) {
+          if (!fields) {
+            fields = [field];
+          }
+
+          var existed;
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = fields[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var fld = _step2.value;
+
+              if (fld.rules && fld.dirty) {
+                existed = true;
+
+                if (field.validating) {
+                  return _this3.validatingClass;
+                } else if (!field.valid) {
+                  return _this3.invalidClass;
+                }
+              }
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+
+          return existed ? _this3.validClass : null;
         }); // find field has sensitive rule
 
         var firstSensitiveRule = Object.values(field._resolvedRules).find(function (item) {
@@ -836,13 +899,13 @@
     var m = message.match(/:fieldName\(.+?\)/g);
 
     if (m) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator = m[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var t = _step.value;
+        for (var _iterator3 = m[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var t = _step3.value;
           var fieldName = t.match(/\((.+)\)/)[1];
           var fld = validation.fields[fieldName];
 
@@ -854,16 +917,16 @@
           message = message.replace(t, text);
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator.return != null) {
-            _iterator.return();
+          if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+            _iterator3.return();
           }
         } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
+          if (_didIteratorError3) {
+            throw _iteratorError3;
           }
         }
       }

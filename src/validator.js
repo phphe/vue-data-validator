@@ -127,18 +127,35 @@ export default {
       vm.$set(field, 'required', false)
       vm.$set(field, 'validating', false)
       vm.$set(field, '_resolvedRules', this.resolveRules(field))
-      vm.$set(field, 'isValidationErrorsVisible', () => {
-        return field.rules && !field.validating && field.dirty && !field.valid
-      })
-      vm.$set(field, 'getValidationClass', () => {
-        if (field.rules && field.dirty) {
-          if (field.validating) {
-            return this.validatingClass
-          } else {
-            return field.valid ? this.validClass : this.invalidClass
+      vm.$set(field, 'isValidationErrorsVisible', (fields) => {
+        if (!fields) {
+          fields = [field]
+        }
+        for (const fld of fields) {
+          if (fld.rules && fld.dirty && !field.validating) {
+            if (!field.valid) {
+              return true
+            }
           }
         }
-        return null
+        return false
+      })
+      vm.$set(field, 'getValidationClass', (fields) => {
+        if (!fields) {
+          fields = [field]
+        }
+        let existed
+        for (const fld of fields) {
+          if (fld.rules && fld.dirty) {
+            existed = true
+            if (field.validating) {
+              return this.validatingClass
+            } else if(!field.valid) {
+              return this.invalidClass
+            }
+          }
+        }
+        return existed ? this.validClass : null
       })
       // find field has sensitive rule
       const firstSensitiveRule = Object.values(field._resolvedRules).find(item => item.sensitive)
