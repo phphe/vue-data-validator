@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.10
+ * vue-data-validator v2.2.12
  * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
@@ -428,6 +428,7 @@
     validtingClass: '',
     // The following methods are not recommended
     install: function install(Vue) {
+      this.Vue = Vue;
       Vue.validator = Vue.prototype.$validator = this;
 
       Vue.prototype.$validate = function (validation, fields) {
@@ -449,6 +450,7 @@
     },
     initValidation: function initValidation(validation, fields, vm) {
       var defaultValidation = {
+        Vue: this.Vue,
         fields: fields,
         dirty: false,
         valid: false,
@@ -795,7 +797,7 @@
           field: field,
           fields: validation.fields,
           validation: validation,
-          Vue: validation.vm.$root.constructor
+          Vue: validation.Vue
         });
       } //
 
@@ -808,7 +810,7 @@
             field: field,
             fields: validation.fields,
             validation: validation,
-            Vue: validation.vm.$root.constructor
+            Vue: validation.Vue
           });
           if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'));
           isValid.then(function () {
@@ -896,7 +898,7 @@
       field: field,
       fields: validation.fields,
       validation: validation,
-      Vue: Vue
+      Vue: validation.Vue
     }) : rule.message;
     message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value);
 

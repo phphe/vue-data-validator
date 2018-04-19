@@ -350,7 +350,7 @@ function getFieldTitle(field) {
 function resolveErrorMessage(rule, field, validation) {
   const {nameInMessage} = field
   let message = isFunction(rule.message)
-  ? rule.message({value: field.value, params: rule.params, field, fields: validation.fields, validation, validation.Vue})
+  ? rule.message({value: field.value, params: rule.params, field, fields: validation.fields, validation, Vue: validation.Vue})
   : rule.message
 
   message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value)
