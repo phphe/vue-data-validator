@@ -7,6 +7,7 @@ export default {
   validtingClass: '',
   // The following methods are not recommended
   install(Vue) {
+    this.Vue = Vue
     Vue.validator = Vue.prototype.$validator = this
     Vue.prototype.$validate = function (validation, fields) { return Vue.validator.validate(validation, fields, this) }
   },
@@ -21,6 +22,7 @@ export default {
   },
   initValidation(validation, fields, vm) {
     const defaultValidation = {
+      Vue: this.Vue,
       fields: fields,
       dirty: false,
       valid: false,
@@ -264,7 +266,7 @@ export default {
         field,
         fields: validation.fields,
         validation,
-        Vue: validation.vm.$root.constructor
+        Vue: validation.Vue,
       })
     }
     //
@@ -276,7 +278,7 @@ export default {
           field,
           fields: validation.fields,
           validation,
-          Vue: validation.vm.$root.constructor
+          Vue: validation.Vue,
         })
         if (!isPromise(isValid)) isValid = isValid ? Promise.resolve() : Promise.reject(new Error('invalid'))
         isValid.then(() => {
@@ -348,7 +350,7 @@ function getFieldTitle(field) {
 function resolveErrorMessage(rule, field, validation) {
   const {nameInMessage} = field
   let message = isFunction(rule.message)
-  ? rule.message({value: field.value, params: rule.params, field, fields: validation.fields, validation, Vue})
+  ? rule.message({value: field.value, params: rule.params, field, fields: validation.fields, validation, validation.Vue})
   : rule.message
 
   message = message.replace(/:name/g, nameInMessage).replace(/:value/g, field.value)

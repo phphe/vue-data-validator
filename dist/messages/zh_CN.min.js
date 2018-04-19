@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.10
+ * vue-data-validator v2.2.11
  * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
