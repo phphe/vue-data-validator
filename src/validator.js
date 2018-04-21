@@ -190,7 +190,7 @@ export default {
       } else {
         deep = isObject(field.value) || isArray(field.value)
       }
-      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, deep)
+      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, {deep})
       vm.$set(field, 'watcher', watcher)
     }
   },

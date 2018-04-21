@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.13
+ * vue-data-validator v2.2.14
  * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
@@ -280,7 +280,9 @@ var validator = {
         deep = helperJs.isObject(field.value) || helperJs.isArray(field.value);
       }
 
-      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, deep);
+      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, {
+        deep: deep
+      });
       vm.$set(field, 'watcher', watcher);
     };
 
