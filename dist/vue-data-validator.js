@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.12
+ * vue-data-validator v2.2.13
  * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
@@ -435,6 +435,7 @@
         return Vue.validator.validate(validation, fields, this);
       };
     },
+    //
     validate: function validate(validation, fields, vm) {
       var _this = this;
 
@@ -682,9 +683,15 @@
             });
           }
         };
-        watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, {
-          deep: field.deep
-        });
+        var deep = void 0;
+
+        if (field.deep !== null) {
+          deep = field.deep;
+        } else {
+          deep = isObject(field.value) || isArray(field.value);
+        }
+
+        watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, deep);
         vm.$set(field, 'watcher', watcher);
       };
 

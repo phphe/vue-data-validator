@@ -1,4 +1,4 @@
-import {isset, isFunction, isPromise, objectMap, empty} from 'helper-js'
+import {isset, isFunction, isObject, isArray, isPromise, objectMap, empty} from 'helper-js'
 export default {
   rules: {},
   messages: {},
@@ -11,6 +11,7 @@ export default {
     Vue.validator = Vue.prototype.$validator = this
     Vue.prototype.$validate = function (validation, fields) { return Vue.validator.validate(validation, fields, this) }
   },
+  //
   validate(validation, fields, vm) {
     // clear old watchers and reset states
     validation.clear && validation.clear()
@@ -183,7 +184,13 @@ export default {
           })
         }
       }
-      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, {deep: field.deep})
+      let deep
+      if (field.deep !== null) {
+        deep = field.deep
+      } else {
+        deep = isObject(field.value) || isArray(field.value)
+      }
+      watcher.unwatch = vm.$watch(watcher.getValue, watcher.handler, deep)
       vm.$set(field, 'watcher', watcher)
     }
   },
