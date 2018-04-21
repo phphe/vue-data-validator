@@ -1,5 +1,5 @@
 /*!
- * vue-data-validator v2.2.14
+ * vue-data-validator v2.2.15
  * (c) 2017-present phphe <phphe@outlook.com> (https://github.com/phphe)
  * Released under the MIT License.
  */
@@ -272,7 +272,7 @@ var validator = {
       };
       var deep = void 0;
 
-      if (field.deep !== null) {
+      if (field.deep != null) {
         deep = field.deep;
       } else {
         deep = helperJs.isObject(field.value) || helperJs.isArray(field.value);

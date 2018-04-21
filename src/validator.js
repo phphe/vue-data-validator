@@ -185,7 +185,7 @@ export default {
         }
       }
       let deep
-      if (field.deep !== null) {
+      if (field.deep != null) {
         deep = field.deep
       } else {
         deep = isObject(field.value) || isArray(field.value)
