@@ -1,3 +1,5 @@
+# Note: use [vue-final-validate](https://phphe.github.io/vue-final-validate/)
+
 # Note: This doc is for 1, not  current version
 # 注意: 以下文档是针对版本1的, 不适用于当前版本
 # vue-data-validator
